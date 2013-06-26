@@ -38,7 +38,7 @@ foreach my $val (@values1) {
    my $removemessage = (split('\n\n', $log))[0];
    
   
-  
+   print "$removemessage\n";
    
    if($log_amend)
     {
@@ -53,6 +53,6 @@ foreach my $val (@values1) {
       print "Response to"; 
        print "$log_response";
     }
-    print "$removemessage\n";
+    
    
 }

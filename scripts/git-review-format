@@ -9,6 +9,7 @@ show = `git review --show-raw #{review_hash}`
 
 from = show.split(/\n/)
 date = from[2]
+
 from =from[1].split(/:/)
 format = "From: " + from[1] +"\n"
 
@@ -21,13 +22,18 @@ subject = subject[1]
 format= format + "Subject: " + "[PATCH] " + subject + "\n"
 
 
-
 format= format + date + "\n\n---\n"
 find = `git review-log`
 find = find.split("\n").map {|row| row.split()}
+
 matched_rowindex=find.find_index {|row| row[1]==review_hash}
-matched_rowindex=matched_rowindex + 3
+
+matched_rowindex=matched_rowindex + 2
+
+
 commit = find[matched_rowindex][1]
+
+
 stat = `git log --stat -1 #{commit}`
 stat= stat.split(/\n/)
 length = stat.length
