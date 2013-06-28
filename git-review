@@ -82,11 +82,11 @@ EOS
   opt :pull, "Fetches reviews from remote repositories" 
 end
 
-           if opts[:push] ==true  
+           if opts[:amend] ==true  
 
                 `git push origin review:review`
                  exit
-           if opts[:pull] ==true
+           if opts[:amend] ==true
              
                 `git pull origin review:review`
        
