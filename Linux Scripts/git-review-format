@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+#!bin/sh
+
+puts "hello"
+review_hash=ARGV[0]
+show = `git review --show-raw #{review_hash}`
+
+
+from = show.split(/\n/)
+date = from[2]
+
+from =from[1].split(/:/)
+format = "From: " + from[1] +"\n"
+
+
+subject = show.split(/@@/)
+subject = subject[2].split(/\n/)
+subject = subject[1]
+
+
+format= format + "Subject: " + "[PATCH] " + subject + "\n"
+
+
+format= format + date + "\n\n---\n"
+find = `git review-log`
+find = find.split("\n").map {|row| row.split()}
+
+matched_rowindex=find.find_index {|row| row[1]==review_hash}
+
+matched_rowindex=matched_rowindex + 2
+
+
+commit = find[matched_rowindex][1]
+
+
+stat = `git log --stat -1 #{commit}`
+stat= stat.split(/\n/)
+length = stat.length
+stat = stat[6..length]
+stat = stat.join("\n") 
+
+
+format = format + stat + "\n"
+
+body = show.split(/commit\s\w{40}/)
+
+format = format + body[1] + "\n--\n"
+pwd = `pwd`
+puts pwd
+version = `git version`
+version= version.split(/git version/)
+format = format + version[1]
+#print format
+File.open("/home/m_mukadam/murtuzareview/#{review_hash}.patch", 'w') { |file| file.write(format) }
+
+%x{gvim #{"/home/m_mukadam/murtuzareview/#{review_hash}.patch"}}

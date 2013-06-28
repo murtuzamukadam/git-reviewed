@@ -1,0 +1,44 @@
+#!/usr/bin/perl 
+
+
+foreach my $rev (`git rev-list review --pretty=oneline`) {
+   
+  ($sha=$rev) =~ s/\s.*$//;
+   
+  foreach my $blob (`git log --numstat -1 $sha`) {
+ 
+my @values = (split('\t', $blob))[2];
+
+  foreach my $val1 (@values) {
+
+
+          my @values1 = (split('\/', $val1))[0];
+           $val1 = (split('\/', $blob))[1];
+         
+          print "\n\n\nReview ";
+         
+          print $val1;
+          my $get_tree = `git cat-file -p $val1`;
+          print $get_tree;
+          
+
+          
+
+foreach my $val (@values1) {
+ 
+      print "commit Reviewed ";
+      print "$val\n";
+ }
+
+
+}
+  
+  }
+
+  
+   my $log = `git log -1 $sha`;
+    my $removemessage = (split('\n\n', $log))[0];
+ print "$removemessage\n";
+   
+}
+
