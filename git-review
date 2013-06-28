@@ -78,19 +78,11 @@ EOS
   opt :show_comments, "Displays the list of comments in a review object"
   opt :log_show, "Displays the log history for all reviews along with the raw content"
   opt :format, "Prepare reviews for email submissions"
-  opt :push, "Updates remote repositories by adding reviews"
-  opt :pull, "Fetches reviews from remote repositories" 
 end
 
-           if opts[:amend] ==true  
-
-                `git push origin review:review`
-                 exit
-           if opts[:amend] ==true
-             
-                `git pull origin review:review`
-       
-           if opts[:amend] ==true               
+          
+              
+          if opts[:amend] ==true               
 		
 		review_log = `git review-log`
 		review_log = review_log.split(/\n/)[1]
