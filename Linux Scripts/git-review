@@ -1,10 +1,67 @@
 #!/usr/bin/env ruby
-
-
 require 'rubygems'
 require "trollop"
 require "open3"
 include Open3
+
+
+
+def make_review(value)
+	
+	File.open('/tmp/review.tmp', 'w') { |file| file.write(value) }
+	%x{gvim #{'/tmp/review.tmp'}}
+	create_review = "git hash-object -w /tmp/review.tmp"
+	review_hash = `#{create_review}`
+	review_hash = review_hash.strip
+	puts "Creating Review Object"
+	puts review_hash
+        return review_hash
+end    
+
+
+
+def create_treeT2(t)
+	
+ 	stdin, stdout, stderr = Open3.popen3("git mktree")
+  	stdin.write t
+  	stdin.close
+  	tree_hashT2 = stdout.read().strip
+  	stdout.close
+	return tree_hashT2
+end
+
+
+def create_treeT1(createT1)
+	
+	
+  	stdin, stdout, stderr = Open3.popen3("git mktree")
+  	stdin.write createT1
+  	stdin.close
+  	tree_hashT1 = stdout.read().strip
+        return tree_hashT1
+end
+
+def commit_tree(tree_hashT1,commit_message,command)
+  	stdin,stdout, stderr = Open3.popen3(command)
+   	stdin.write commit_message
+   	stdin.close
+   	commit_treeT1 = stdout.read()
+   	commit_treeT1 = commit_treeT1.strip
+   	createreviewbranch = ` git branch -f review #{commit_treeT1}`
+end
+
+def search(commit_hash,tree_hashT2)
+
+	checkreviewcontents = `git ls-tree review  `
+  	checkreviewcontents= checkreviewcontents.split("\n").map {|row| row.split()}
+  	matched_rowindex=checkreviewcontents.find_index {|row| row[3]==commit_hash}
+  	checkreviewcontents[matched_rowindex][2]= tree_hashT2
+  	tree_contentsT1=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line[3]}.join "\n"
+        return tree_contentsT1
+  end 	
+
+
+
 
 opts = Trollop::options do
   
@@ -19,18 +76,32 @@ EOS
   opt :respond, "Respond to a review"
   opt :show_raw, "Display raw review contents"
   opt :show_comments, "Displays the list of comments in a review object"
-   opt :log_show, "Displays the log history for all reviews along with the raw content"
-   opt :format, "Prepare reviews for email submissions"
+  opt :log_show, "Displays the log history for all reviews along with the raw content"
+  opt :format, "Prepare reviews for email submissions"
 end
 
           
               
-          if opts[:amend] ==true
+          if opts[:amend] ==true               
 		
-	        review_amend=`git review-amend`
-                puts review_amend
-                exit
-               
+		review_log = `git review-log`
+		review_log = review_log.split(/\n/)[1]
+		review_hash = review_log.split[1]                        
+		cmd = `git show #{review_hash}`
+		tree_hash= cmd.lines.first
+		tree_hash= tree_hash.split[1]             #Getting the tree the review belongs to
+		value = `git show #{review_hash}`
+		amended_hash = make_review(value)
+		checkcontents = `git ls-tree review:#{tree_hash}`
+		checkcontents = checkcontents + "100644 blob #{amended_hash}\t#{amended_hash}" 
+                tree_hashT2_amend = create_treeT2(checkcontents)
+		tree_contentsT1_amend = search(tree_hash,tree_hashT2_amend)
+		tree_hashT1_amend = create_treeT1(tree_contentsT1_amend)
+   		message_amend= "Amended Review #{review_hash}"
+    	        command_amend= "git commit-tree #{tree_hashT1_amend} -p review"
+                commit_tree(tree_hashT1_amend,message_amend,command_amend)
+		exit
+
            elsif opts[:log]==true
                 
            
@@ -106,53 +177,17 @@ end
                 get_tree = `git show #{review_respond}`
                 tree_hash= get_tree.lines.first
                 tree_hash= tree_hash.split[1] 
-                
                 response=`git show #{review_respond}`
-                response.gsub!(/^/, ">")           #putting in chevrons at the beginning of every line
-		 
-		File.open('/tmp/review.tmp', 'w') { |file| file.write(response) }
-		%x{gvim #{'/tmp/review.tmp'}}
-                create_review = "git hash-object -w /tmp/review.tmp"
-		review_hash_respond = `#{create_review}`
-		review_hash_respond = review_hash_respond.strip
-		puts "Creating Response Review Object"
-		puts review_hash_respond
-               
- 
-
-
-                 tree_contents_respond= `git ls-tree review:#{tree_hash}` 
-	         tree_contents_respond = tree_contents_respond + "100644 blob #{review_hash_respond}\t#{review_hash_respond}"
-     
-    		 stdin6, stdout6, stderr6 = Open3.popen3("git mktree")
-     		 stdin6.write tree_contents_respond
-     		 stdin6.close
-     		 tree_hashT2_respond = stdout6.read().strip
-              
-                 checkreviewcontents = `git ls-tree review  `
-  
-  		checkreviewcontents= checkreviewcontents.split("\n").map {|row| row.split()}
-  		matched_rowindex=checkreviewcontents.find_index {|row| row[3]==tree_hash}
-  		checkreviewcontents[matched_rowindex][2]= tree_hashT2_respond
-  		tree_contentsT1=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line[3]}.join "\n"
-  		stdin7, stdout7, stderr7 = Open3.popen3("git mktree")
-  		stdin7.write tree_contentsT1
-  		stdin7.close
-  
-  		tree_hashT1 = stdout7.read()
-
-               commit_message= "Response to #{review_respond}"
-  		stdin13,stdout13, stderr13 = Open3.popen3("git commit-tree #{tree_hashT1} -p review ")
-    		stdin13.write commit_message
-   		stdin13.close
-  		 commit_treeT1 = stdout13.read()
-   
-  		commit_treeT1 = commit_treeT1.strip
-  		createreviewbranch = ` git branch -f review #{commit_treeT1}`
-      
-	        exit
-
-                 
+                review_hash_respond = make_review(response) 
+                tree_contents_respond= `git ls-tree review:#{tree_hash}` 
+	        tree_contents_respond = tree_contents_respond + "100644 blob #{review_hash_respond}\t#{review_hash_respond}"
+                tree_hashT2_respond = create_treeT2(tree_contents_respond) 
+                tree_contentsT1 = search(tree_hash,tree_hashT2_respond)
+                tree_hashT1 = create_treeT1(tree_contentsT1)
+                message_respond= "Response to #{review_respond}"
+                command_respond= "git commit-tree #{tree_hashT1} -p review "
+                commit_tree(tree_hashT1,message_respond,command_respond)
+                exit                 
                 
            end
 
@@ -172,18 +207,9 @@ if value.length==0
   exit
 end
 
-
-   
 value.gsub!(/^/, ">")           #putting in chevrons at the beginning of every line
-puts 
-File.open('/tmp/review.tmp', 'w') { |file| file.write(value) }
-%x{gvim #{'/tmp/review.tmp'}}
-create_review = "git hash-object -w /tmp/review.tmp"
-review_hash = `#{create_review}`
-review_hash = review_hash.strip
-puts "Creating Review Object"
-puts review_hash
-   
+review_hash = make_review(value)  
+
 
 
 check_tree = `git ls-tree review`
@@ -193,60 +219,30 @@ t="100644 blob #{review_hash}\t#{review_hash}"
 
 #A - making a review for the first time
 
-if check_tree.length==0
+ if check_tree.length==0
   
-  stdin, stdout, stderr = Open3.popen3("git mktree")
-  stdin.write t
-  stdin.close
-  tree_hashT2A = stdout.read().strip
-  
-  stdout.close
-  
-  
+  tree_hashT2A = create_treeT2(t)
   createT1A = "040000 tree #{tree_hashT2A}\t#{commit_hash}\n"
-  stdin1, stdout1, stderr1 = Open3.popen3("git mktree")
-  stdin1.write createT1A
-  stdin1.close
-  tree_hashT1A = stdout1.read()
-  
-  commit_message= "This is the first review on any commit"
-  stdin10,stdout10, stderr10 = Open3.popen3("git commit-tree #{tree_hashT1A}")
-   stdin10.write commit_message
-   stdin10.close
-   commit_treeT1A = stdout10.read()
-   commit_treeT1A = commit_treeT1A.strip
-   createreviewbranch = ` git branch -f review #{commit_treeT1A}`
+  tree_hashT1A= create_treeT1(createT1A)  
+  messageA = "This is the first review on any commit"
+  commandA = "git commit-tree #{tree_hashT1A}"
+  commit_tree(tree_hashT1A,messageA,commandA)
 
+
+  
 
 #B making a review on a new commit
  else
    
-  checkcontents = `git ls-tree review | grep #{commit_hash} `
+    checkcontents = `git ls-tree review | grep #{commit_hash} `
  
-  if checkcontents.length==0
-  
-  stdin2, stdout2, stderr2 = Open3.popen3("git mktree")
-  stdin2.write t
-  stdin2.close
-  tree_hashT2B = stdout2.read().strip
-  stdout2.close
-
-  check_tree = check_tree + "040000 tree #{tree_hashT2B}\t#{commit_hash}"
-  stdin3, stdout3, stderr3 = Open3.popen3("git mktree")
-  stdin3.write check_tree
-  stdin3.close
-  
-  tree_hashT1B = stdout3.read()
-  tree_hashT1B=tree_hashT1B.strip
-  stderr3.read()
-
-  commit_message= "This is a first review on this commit"
-  stdin11,stdout11, stderr11 = Open3.popen3("git commit-tree #{tree_hashT1B} -p review ")
-   stdin11.write commit_message
-   stdin11.close
-   commit_treeT1B = stdout11.read()
-   commit_treeT1B = commit_treeT1B.strip
-   createreviewbranch = ` git branch -f review #{commit_treeT1B}`
+    if checkcontents.length==0
+      tree_hashT2B = create_treeT2(t) 
+      check_tree= check_tree + "040000 tree #{tree_hashT2B}\t#{commit_hash}"
+      tree_hashT1B = create_treeT1(check_tree)
+      messageB = "This is the first review on this commit"
+      commandB = "git commit-tree #{tree_hashT1B} -p review"
+      commit_tree(tree_hashT1B,messageB,commandB)
   
      
 
@@ -256,41 +252,31 @@ if check_tree.length==0
      
      tree_contents= `git ls-tree review:#{commit_hash}` 
      tree_contents = tree_contents + "100644 blob #{review_hash}\t#{review_hash}"
-     
-     stdin4, stdout4, stderr4 = Open3.popen3("git mktree")
-     stdin4.write tree_contents
-     stdin4.close
-     tree_hashT2C = stdout4.read().strip
-  
+     tree_hashT2C = create_treeT2(tree_contents)    
+     tree_contentsT1C = search(commit_hash,tree_hashT2C)
+     tree_hashT1C = create_treeT1(tree_contentsT1C)
+     messageC= "This commit has been reviewed before"
+     commandC= "git commit-tree #{tree_hashT1C} -p review "
+     commit_tree(tree_hashT1C,messageC,commandC)
 
-  checkreviewcontents = `git ls-tree review  `
-  
-  checkreviewcontents= checkreviewcontents.split("\n").map {|row| row.split()}
-  matched_rowindex=checkreviewcontents.find_index {|row| row[3]==commit_hash}
-  checkreviewcontents[matched_rowindex][2]= tree_hashT2C
-  tree_contentsT1C=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line[3]}.join "\n"
-  stdin5, stdout5, stderr5 = Open3.popen3("git mktree")
-  stdin5.write tree_contentsT1C
-  stdin5.close
-  
-  tree_hashT1C = stdout5.read()
-
-  
-  tree_hashT1C=tree_hashT1C.strip
-  commit_message= "This commit has been reviewed before"
-  stdin12,stdout12, stderr12 = Open3.popen3("git commit-tree #{tree_hashT1C} -p review ")
-   stdin12.write commit_message
-   stdin12.close
-   commit_treeT1C = stdout12.read()
-   
-   commit_treeT1C = commit_treeT1C.strip
-   createreviewbranch = ` git branch -f review #{commit_treeT1C}`
-
+ 
   
       
 
 end   
 end   
+
+
+
+
+
+
+
+
+
+
+
+
 
 
  
