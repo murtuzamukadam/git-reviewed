@@ -1,0 +1,152 @@
+
+.\"https://github.com/mmukadam/git-review/
+.
+.TH "GIT\-REVIEW\-" "2" "July 2013" "" 
+.
+.SH "NAME"
+\fBgit\-review\fR \- Creates a review on a commit
+.
+.SH "SYNOPSIS"
+\fBgit\-review\fR
+.
+.SH "DESCRIPTION"
+Allows the user to make a review on a given commit hash\.
+.
+.SH "OPTIONS"
+<log>
+.
+.P
+Shows the log history of the reviews made along with the reviewer details.\.
+.
+<log-show>
+.
+.P
+Shows the log history of the reviews made along with raw review content.
+.
+<amend>
+.
+.P
+Allows reviewer to make any change to the last review.
+.
+<show-raw> review-hash
+.
+.PShows the contents of the review object.
+.
+<format> review-hash
+.
+.P
+Prepares the review for an email submission
+.
+<respond> review-hash
+.
+.P
+Allows reviewer to respond to any review
+.
+<show-comments> review-hash
+.
+.SH "EXAMPLES"
+$ git review commit-hash
+... Creating a review object on a particular commit
+Creating Review Object
+5c1b78028dca1b7424b5d6a0c888fa829236cda2
+.P
+$ git review --log
+...shows the log history of the reviews made
+Review b88a0c3b2c8a5924acefdb99fb50bff3a2dfe7ff
+commit Reviewed 02f8efec7e50c925924bbe3a6160de0a82e8b724
+Response to 921b762aad203dca6e265b2658c7c3c0566c702a
+commit 3172364ddc0eafdcdf88275e4c56867fd748a8c4
+Author: Murtuza Mukadam 
+Date:   Fri Jun 21 23:50:50 2013 -0400
+.P
+$ git review --log-show
+...shows the log history of the reviews made along with the review content
+Review dc0a9fbf5030a824e29657618d5184749aaaf422
+
+content
+
+commit Reviewed 02f8efec7e50c925924bbe3a6160de0a82e8b724
+commit 3addb240fc1ed0fce6f1fc72915d6575fcbfe475
+Author: Murtuza Mukadam 
+Date:   Fri Jun 21 23:33:03 2013 -0400
+
+.P
+
+$ git review --amend 
+... allows to make a change to the review
+Amending Review Object
+838a2d22de4d0bb393f2874bc92734a073757fea
+.P
+
+
+$ git review --show-raw review-hash
+... shows the raw content of the review object
+Commit Reviewed: 02f8efec7e50c925924bbe3a6160de0a82e8b724
+Reviewer: Murtuza Mukadam 
+Date:   Wed Jun 19 18:40:38 2013 -0400
+
+content
+
+.P
+
+
+$ git review --respond review-hash
+... allows reviewer to respond to a review
+Creating Response Review Object
+b3a3becba4b947a381c53a8444ac239b57acd6b0
+
+.P
+
+$ git review --show-comments review-hash
+... allows reviewer to list the comments made on the review object
+Review on commit 02f8efec7e50c925924bbe3a6160de0a82e8b724
+
+Comment starting at line 6:
+
+this is not correct
+
+
+Comment starting at line 10:
+it should be a running script
+.
+.P
+.
+$ git review --format review-hash
+... prepares the review for an email submission
+
+From:  Murtuza Mukadam 
+Subject: [PATCH] >>+#!/usr/bin/env ruby
+Date:   Fri Jun 21 23:50:50 2013 -0400
+
+---
+ .../b88a0c3b2c8a5924acefdb99fb50bff3a2dfe7ff       | 62 ++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+
+>>Author: Murtuza Mukadam 
+>>Date:   Fri May 31 22:31:38 2013 -0400
+>>
+>>    This is my second commit
+>>
+>>diff --git a/git-review.txt b/git-review.txt
+>>new file mode 100644
+>>index 0000000..5695fd9
+>>--- /dev/null
+>>+++ b/git-review.txt
+>>@@ -0,0 +1,48 @@
+>>+#!/usr/bin/env ruby
+>>+
+>>+cmd = "git diff"
+>>+value = `git diff`
+
+--
+ 1.8.1.msysgit.
+.
+.P
+.SH "AUTHOR"
+Written by Murtuza Mukadam <\fIusers\.encs\.concordia\.ca/~m_mukada/\fR>
+.
+.SH "REPORTING BUGS"
+<\fIhttps://github\.com/mmukadam/git\-review/issues\fR>
+.
+.SH "SEE ALSO"
+<\fIhttps://github\.com/mmukadam/git\-review\fR>
