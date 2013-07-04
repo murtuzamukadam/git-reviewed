@@ -1,0 +1,21 @@
+From Daniel's email message:
+
+Here are two scripts. One extracts the lines, and the other searches
+them.
+
+You run the parsePatches.pl on a git log with patches. This generates a
+file. With that file you create a sqlite database (lineslinus.db) with
+the following schema:
+
+CREATE TABLE line(cid char(40), filename varchar(140), linetype char, line text);
+CREATE INDEX lineidx on line(line, linetype, filename);
+CREATE INDEX lineidx2 on line(cid);
+
+For linux is will take hours... depending on how fast your computer is.
+
+then you run searchMatch.pl with the database in the same directory as
+the executable.
+
+ideally searchMatch should compute jaccard (but I was too lazy to do it
+:) and use it to determine the closest match.
+
