@@ -1,0 +1,291 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require "trollop"
+require "open3"
+include Open3
+
+
+
+def make_review(value)
+	
+	File.open('/tmp/review.tmp', 'w') { |file| file.write(value) }
+	%x{gvim #{'/tmp/review.tmp'}}
+	create_review = "git hash-object -w /tmp/review.tmp"
+	review_hash = `#{create_review}`
+	review_hash = review_hash.strip
+	puts "Creating Review Object"
+	puts review_hash
+        return review_hash
+end    
+
+
+
+def create_treeT2(t)
+	
+ 	stdin, stdout, stderr = Open3.popen3("git mktree")
+  	stdin.write t
+  	stdin.close
+  	tree_hashT2 = stdout.read().strip
+  	stdout.close
+	return tree_hashT2
+end
+
+
+def create_treeT1(createT1)
+	
+	
+  	stdin, stdout, stderr = Open3.popen3("git mktree")
+  	stdin.write createT1
+  	stdin.close
+  	tree_hashT1 = stdout.read().strip
+        return tree_hashT1
+end
+
+def commit_tree(tree_hashT1,commit_message,command)
+  	stdin,stdout, stderr = Open3.popen3(command)
+   	stdin.write commit_message
+   	stdin.close
+   	commit_treeT1 = stdout.read()
+   	commit_treeT1 = commit_treeT1.strip
+   	createreviewbranch = ` git branch -f review #{commit_treeT1}`
+end
+
+def search(commit_hash,tree_hashT2)
+
+	checkreviewcontents = `git ls-tree review  `
+  	checkreviewcontents= checkreviewcontents.split("\n").map {|row| row.split()}
+  	matched_rowindex=checkreviewcontents.find_index {|row| row[3]==commit_hash}
+  	checkreviewcontents[matched_rowindex][2]= tree_hashT2
+  	tree_contentsT1=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line[3]}.join "\n"
+        return tree_contentsT1
+  end 	
+
+
+
+
+opts = Trollop::options do
+  
+  banner <<-EOS
+Creates a review object on a commit
+
+
+EOS
+
+  opt :amend, "Change the last review committed"
+  opt :log, "Display log history for all reviews done" 
+  opt :respond, "Respond to a review"
+  opt :show_raw, "Display raw review contents"
+  opt :show_comments, "Displays the list of comments in a review object"
+  opt :log_show, "Displays the log history for all reviews along with the raw content"
+  opt :format, "Prepare reviews for email submissions"
+  opt :push, "Updates remote repositories by adding reviews"
+  opt :pull, "Fetches reviews from remote repositories" 
+end
+
+          if opts[:push] ==true  
+
+                `git push origin review:review`
+                 exit
+          elsif opts[:pull] ==true
+             
+                `git pull origin review:review`
+                 exit
+              
+          elsif opts[:amend] ==true               
+		
+		review_log = `git review-log`
+		review_log = review_log.split(/\n/)[1]
+		review_hash = review_log.split[1]                        
+		cmd = `git show #{review_hash}`
+		tree_hash= cmd.lines.first
+		tree_hash= tree_hash.split[1]             #Getting the tree the review belongs to
+		value = `git show #{review_hash}`
+		amended_hash = make_review(value)
+		checkcontents = `git ls-tree review:#{tree_hash}`
+		checkcontents = checkcontents + "100644 blob #{amended_hash}\t#{amended_hash}" 
+                tree_hashT2_amend = create_treeT2(checkcontents)
+		tree_contentsT1_amend = search(tree_hash,tree_hashT2_amend)
+		tree_hashT1_amend = create_treeT1(tree_contentsT1_amend)
+   		message_amend= "Amended Review #{review_hash}"
+    	        command_amend= "git commit-tree #{tree_hashT1_amend} -p review"
+                commit_tree(tree_hashT1_amend,message_amend,command_amend)
+		exit
+
+           elsif opts[:log]==true
+                
+           
+		review_log=`git review-log`
+                puts review_log
+                exit 
+               
+          elsif opts[:format]==true
+                
+           
+                if ARGV.length ==0
+                 puts " --format needs a review hash. Check git review --help"
+                 exit
+                end
+               
+                review_format = ARGV[0] 
+               
+		format =`git review-format #{review_format}`
+                print format
+                exit 
+		
+               
+            elsif opts[:log_show]==true
+                
+		review_log_show=`git review-log-show`
+                puts review_log_show
+                exit
+                
+           elsif opts[:show_comments]==true
+               
+
+                if ARGV.length ==0
+                 puts " --show-comments needs a review hash. Check git review --help"
+                 exit
+                end
+               
+                review_comments = ARGV[0] 
+               
+		review_comments=`git comment #{review_comments}`
+                print review_comments
+                exit 
+
+            elsif opts[:show_raw]==true
+            
+                if ARGV.length ==0
+                 puts " --show-raw needs a review hash. Check git review --help"
+                 exit
+                end
+               
+                review_raw = ARGV[0]
+              
+                get_tree = `git show #{review_raw}`
+                tree_hash= get_tree.lines.first
+                tree_hash= tree_hash.split[1] 
+                
+                reviewer_details = `git log -1 review  -- #{tree_hash}/#{review_raw}` 
+                puts "Commit Reviewed: #{tree_hash}"
+                print "Reviewer"
+                puts reviewer_details[54..-1]
+                review_show_raw= %x(git cat-file -p #{review_raw})
+                puts review_show_raw
+                 
+                exit
+
+            elsif opts[:respond]==true
+              
+		 if ARGV.length ==0
+                 puts " --respond needs a review hash. Check git review --help"
+                 exit
+                end
+               
+                review_respond = ARGV[0]  
+                get_tree = `git show #{review_respond}`
+                tree_hash= get_tree.lines.first
+                tree_hash= tree_hash.split[1] 
+                response=`git show #{review_respond}`
+                review_hash_respond = make_review(response) 
+                tree_contents_respond= `git ls-tree review:#{tree_hash}` 
+	        tree_contents_respond = tree_contents_respond + "100644 blob #{review_hash_respond}\t#{review_hash_respond}"
+                tree_hashT2_respond = create_treeT2(tree_contents_respond) 
+                tree_contentsT1 = search(tree_hash,tree_hashT2_respond)
+                tree_hashT1 = create_treeT1(tree_contentsT1)
+                message_respond= "Response to #{review_respond}"
+                command_respond= "git commit-tree #{tree_hashT1} -p review "
+                commit_tree(tree_hashT1,message_respond,command_respond)
+                exit                 
+                
+           end
+
+if ARGV.length == 1 
+  commit_hash = ARGV[0]
+  cmd = "git log -u -1 #{commit_hash}"
+else
+  cmd = "git diff "
+  
+end
+  
+  value = `#{cmd}`
+ 
+  
+if value.length==0
+  puts " Review object cannot be created. Check git review --help "
+  exit
+end
+
+value.gsub!(/^/, ">")           #putting in chevrons at the beginning of every line
+review_hash = make_review(value)  
+
+
+
+check_tree = `git ls-tree review`
+t="100644 blob #{review_hash}\t#{review_hash}"
+
+
+
+#A - making a review for the first time
+
+ if check_tree.length==0
+  
+  tree_hashT2A = create_treeT2(t)
+  createT1A = "040000 tree #{tree_hashT2A}\t#{commit_hash}\n"
+  tree_hashT1A= create_treeT1(createT1A)  
+  messageA = "This is the first review on any commit"
+  commandA = "git commit-tree #{tree_hashT1A}"
+  commit_tree(tree_hashT1A,messageA,commandA)
+
+
+  
+
+#B making a review on a new commit
+ else
+   
+    checkcontents = `git ls-tree review | grep #{commit_hash} `
+ 
+    if checkcontents.length==0
+      tree_hashT2B = create_treeT2(t) 
+      check_tree= check_tree + "040000 tree #{tree_hashT2B}\t#{commit_hash}"
+      tree_hashT1B = create_treeT1(check_tree)
+      messageB = "This is the first review on this commit"
+      commandB = "git commit-tree #{tree_hashT1B} -p review"
+      commit_tree(tree_hashT1B,messageB,commandB)
+  
+     
+
+  
+#C making a multiple review on same commit
+  else
+     
+     tree_contents= `git ls-tree review:#{commit_hash}` 
+     tree_contents = tree_contents + "100644 blob #{review_hash}\t#{review_hash}"
+     tree_hashT2C = create_treeT2(tree_contents)    
+     tree_contentsT1C = search(commit_hash,tree_hashT2C)
+     tree_hashT1C = create_treeT1(tree_contentsT1C)
+     messageC= "This commit has been reviewed before"
+     commandC= "git commit-tree #{tree_hashT1C} -p review "
+     commit_tree(tree_hashT1C,messageC,commandC)
+
+ 
+  
+      
+
+end   
+end 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
