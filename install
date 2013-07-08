@@ -1,0 +1,27 @@
+#!/bin/bash
+
+
+cp scripts/git-comment /usr/local/bin/git-comment
+chown root:root /usr/local/bin/git-comment
+
+
+
+cp scripts/git-review /usr/local/bin/git-review
+chown root:root /usr/local/bin/git-review
+
+
+cp scripts/git-review-format /usr/local/bin/git-review-format
+chown root:root /usr/local/bin/git-review-format
+
+
+cp scripts/git-review-log /usr/local/bin/git-review-log
+chown root:root /usr/local/bin/git-review-log
+
+
+cp scripts/git-review-log-show /usr/local/bin/git-review-log-show
+chown root:root /usr/local/bin/git-review-log-show
+
+
+
+cp doc/git-review.1 /usr/local/share/man/git-review.1
+chown root:root /usr/local/share/man/git-review.1 
