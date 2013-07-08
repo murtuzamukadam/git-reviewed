@@ -3,4 +3,6 @@ To have git-review installed on your machine:
 1) Clone the repository https://github.com/mmukadam/git-review
 2) Run sudo bash install
 3) Clone the repository you wish to review
-4) Start reviewing 
+4) Start reviewing
+5) Use git-review --pull inorder to pull all the reviews made in a repository
+6) Use git-review --push to push the reviews onto the repository 
