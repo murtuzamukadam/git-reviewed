@@ -119,8 +119,17 @@ sub Find_Match_Line
     die unless $type eq '+' or $type eq '-';
     
     $line =~ s/;/<semi>/g;
+    
+    #pcr do trim
+    $line =~ s/^\s*//g;
+    $line =~ s/\s*$//g;
 
     return Simple_Array_Query("select distinct cid from line where linetype = ? and filename = ? and line = ?", $type, $file, $line);
+
+    #pcr: use like instead of =
+    #$line = '%' . $line . '%';
+    #like return Simple_Array_Query("select distinct cid from line where linetype = ? and filename = ? and line like ?", $type, $file, $line);
+
 }
 
 
@@ -155,6 +164,7 @@ sub Simple_Array_Query
     my $q = $dbh->prepare($query);
     $q->execute(@parms);
     while (my $item = $q->fetchrow_array()) {
+	print "$item\n";
         push @result, $item;
     }
     return @result;

@@ -16,6 +16,9 @@ while(<>) {
 	my $type = $1;
 	my $rest = $2;
 	$rest =~ s/;/<semi>/g;
+	#pcr: do trim
+	$rest =~ s/^\s*//g;
+    	$rest =~ s/\s*$//g;
 	print "$cid;$file;$type;$rest\n" if $rest =~ /[a-zA-Z0-9]/;
     } else {
 	; #ignore
