@@ -1,0 +1,31 @@
+Match email patches to their appropriate commit
+
+*Extract lines from git: You run the parsePatches.pl on a git log with patches. This generates a
+file. 
+
+git clone <name of repo>
+git log -p --after={2012-11-30} --before={2013-01-01} | ./parsePatches.pl > linuxhistory.in
+
+*Create a db to dump linuxhistory into and dump linuxhistory: With that file you
+create a sqlite database (lineslinus.db) For linux is will take hours...
+depending on how fast your computer is.
+
+sqlite3 lineslinus.db
+
+CREATE TABLE line(cid char(40), filename varchar(140), linetype char, line text);
+
+.separator ';'
+.import linuxhistory.in line
+
+CREATE INDEX lineidx on line(line, linetype, filename);
+CREATE INDEX lineidx2 on line(cid);
+
+
+*Run searchMatch.pl with the database in the same directory as the lineslinus.db
+
+KLUDGE: we are trimming whitespace, otherwise there were no matches
+
+cat <location with files> | ./searchMatch.pl > mailmatch.out
+
+*Future work: ideally searchMatch should compute jaccard and use it to determine the closest match.
+
