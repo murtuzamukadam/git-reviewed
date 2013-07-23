@@ -1,0 +1,137 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require "open3"
+include Open3
+
+
+
+def make_review_mbox
+	
+        create_review = "git hash-object -w data.tmp"
+	review_hash = `#{create_review}`
+	review_hash = review_hash.strip
+	puts review_hash
+        return review_hash
+end    
+
+
+
+def create_treeT2(t)
+	
+ 	stdin, stdout, stderr = Open3.popen3("git mktree")
+  	stdin.write t
+  	stdin.close
+  	tree_hashT2 = stdout.read().strip
+  	stdout.close
+	return tree_hashT2
+end
+
+
+def create_treeT1(createT1)
+	
+	
+  	stdin, stdout, stderr = Open3.popen3("git mktree")
+  	stdin.write createT1
+  	stdin.close
+  	tree_hashT1 = stdout.read().strip
+        return tree_hashT1
+end
+
+def commit_tree(tree_hashT1,commit_message,command)
+  	stdin,stdout, stderr = Open3.popen3(command)
+   	stdin.write commit_message
+   	stdin.close
+   	commit_treeT1 = stdout.read()
+   	commit_treeT1 = commit_treeT1.strip
+   	createreviewbranch = ` git branch -f review #{commit_treeT1}`
+end
+
+def search(commit_hash,tree_hashT2)
+
+	checkreviewcontents = `git ls-tree review  `
+  	checkreviewcontents= checkreviewcontents.split("\n").map {|row| row.split()}
+  	matched_rowindex=checkreviewcontents.find_index {|row| row[3]==commit_hash}
+  	checkreviewcontents[matched_rowindex][2]= tree_hashT2
+  	tree_contentsT1=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line[3]}.join "\n"
+        return tree_contentsT1
+  end 	
+
+
+
+commit_hash = ARGV[0]
+if commit_hash == "not match"
+  exit
+
+else
+review_hash = make_review_mbox()  
+end
+
+
+check_tree = `git ls-tree review`
+t="100644 blob #{review_hash}\t#{review_hash}"
+
+
+
+#A - making a review for the first time
+
+ if check_tree.length==0
+  
+  tree_hashT2A = create_treeT2(t)
+  createT1A = "040000 tree #{tree_hashT2A}\t#{commit_hash}\n"
+  tree_hashT1A= create_treeT1(createT1A)  
+  messageA = "This is a thread"
+  commandA = "git commit-tree #{tree_hashT1A}"
+  commit_tree(tree_hashT1A,messageA,commandA)
+
+
+  
+
+#B making a review on a new commit
+ else
+   
+   checkcontents = `git ls-tree review | grep #{commit_hash} `
+ 
+   if checkcontents.length==0
+     tree_hashT2B = create_treeT2(t) 
+      check_tree= check_tree + "040000 tree #{tree_hashT2B}\t#{commit_hash}"
+     tree_hashT1B = create_treeT1(check_tree)
+      messageB = "This is a thread"
+      commandB = "git commit-tree #{tree_hashT1B} -p review"
+      commit_tree(tree_hashT1B,messageB,commandB)
+  
+     
+
+  
+#C making a multiple review on same commit
+  else
+     
+     tree_contents= `git ls-tree review:#{commit_hash}` 
+    tree_contents = tree_contents + "100644 blob #{review_hash}\t#{review_hash}"
+     tree_hashT2C = create_treeT2(tree_contents)    
+     tree_contentsT1C = search(commit_hash,tree_hashT2C)
+     tree_hashT1C = create_treeT1(tree_contentsT1C)
+     messageC= "This is a thread"
+     commandC= "git commit-tree #{tree_hashT1C} -p review "
+     commit_tree(tree_hashT1C,messageC,commandC)
+
+ 
+  
+      
+
+end   
+end 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
