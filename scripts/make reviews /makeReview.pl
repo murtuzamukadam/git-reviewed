@@ -43,6 +43,15 @@ my $dbh = DBI->connect("dbi:SQLite:dbname=$dbName", '', '') or die "Cannot conne
               print MYFILE "Message-Id : <$thisid>\n";
               print "$thisid\n";
               print MYFILE "Date : $date\n";
+              print "For $thisid this is the $referenceid\n and length is ";
+              if(length($referenceid ne 0)) {
+                  
+                  print MYFILE "References: $referenceid\n";
+                  }
+
+              if(length($replyto ne 0)) {
+                  print MYFILE "$replyto\n";
+                  }        
               print MYFILE "Subject: $subject\n";
               print MYFILE "Cc: $cc\n";
               print MYFILE "commit: $commitid\n\n";
@@ -74,8 +83,8 @@ elsif ( $referenceid =~ /<(.*?)>/ ){
               print MYFILE "Message-Id : <$thisid>\n";
               print "$thisid\n";
               print MYFILE "Date : $date\n";
-              print MYFILE "In-Reply-To : $replyto\n";
-              print MYFILE "References : $reference\n";
+              print MYFILE "$replyto\n";
+              print MYFILE "References : $referenceid\n";
               print MYFILE "Subject: $subject\n";
               print MYFILE "Cc: $cc\n";
               print MYFILE "commit: $commitid\n\n";

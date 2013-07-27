@@ -79,7 +79,7 @@ t="100644 blob #{review_hash}\t#{review_hash}"
   tree_hashT2A = create_treeT2(t)
   createT1A = "040000 tree #{tree_hashT2A}\t#{commit_hash}\n"
   tree_hashT1A= create_treeT1(createT1A)  
-  messageA = "This is a thread"
+  messageA = "This is a first review on this commit"
   commandA = "git commit-tree #{tree_hashT1A}"
   commit_tree(tree_hashT1A,messageA,commandA)
 
@@ -95,7 +95,7 @@ t="100644 blob #{review_hash}\t#{review_hash}"
      tree_hashT2B = create_treeT2(t) 
       check_tree= check_tree + "040000 tree #{tree_hashT2B}\t#{commit_hash}"
      tree_hashT1B = create_treeT1(check_tree)
-      messageB = "This is a thread"
+      messageB = "This is a first review on this commit"
       commandB = "git commit-tree #{tree_hashT1B} -p review"
       commit_tree(tree_hashT1B,messageB,commandB)
   
@@ -110,7 +110,7 @@ t="100644 blob #{review_hash}\t#{review_hash}"
      tree_hashT2C = create_treeT2(tree_contents)    
      tree_contentsT1C = search(commit_hash,tree_hashT2C)
      tree_hashT1C = create_treeT1(tree_contentsT1C)
-     messageC= "This is a thread"
+     messageC= "This commit has been reviewed before"
      commandC= "git commit-tree #{tree_hashT1C} -p review "
      commit_tree(tree_hashT1C,messageC,commandC)
 
