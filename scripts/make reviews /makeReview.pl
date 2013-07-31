@@ -5,6 +5,7 @@ use strict;
 use DBI;
 my $thisid = ' ';
 my $dbName = 'data.db';
+my $email = ' ';
 my @tid=0;
 my $dbh = DBI->connect("dbi:SQLite:dbname=$dbName", '', '') or die "Cannot connect: $DBI::errstr";
 
@@ -40,10 +41,14 @@ my $dbh = DBI->connect("dbi:SQLite:dbname=$dbName", '', '') or die "Cannot conne
               
               open (MYFILE, '> data.tmp');
               print MYFILE "From : $from\n";
+              if ( $from =~ /<(.*?)>/ )
+		{
+  		   $email = $1;
+    	          
+		}
               print MYFILE "Message-Id : <$thisid>\n";
-              print "$thisid\n";
               print MYFILE "Date : $date\n";
-              print "For $thisid this is the $referenceid\n and length is ";
+              
               if(length($referenceid ne 0)) {
                   
                   print MYFILE "References: $referenceid\n";
@@ -57,8 +62,8 @@ my $dbh = DBI->connect("dbi:SQLite:dbname=$dbName", '', '') or die "Cannot conne
               print MYFILE "commit: $commitid\n\n";
               print MYFILE "$body_str";
               close (MYFILE); 
-              print " thread \n";  
-              my $show =`git reviewmbox '$commitid'`;
+              print "This is a thread \n";
+              my $show =`git reviewmbox '$commitid' '$from' '$date' '$email'`;
               print $show;
               
              
@@ -80,8 +85,13 @@ elsif ( $referenceid =~ /<(.*?)>/ ){
               my ($tid, $commitid) = @$row;
               open (MYFILE, '> data.tmp');
               print MYFILE "From : $from\n";
+              if ( $from =~ /<(.*?)>/ )
+		{
+   		   $email = $1;
+    		  
+		}
               print MYFILE "Message-Id : <$thisid>\n";
-              print "$thisid\n";
+              
               print MYFILE "Date : $date\n";
               print MYFILE "$replyto\n";
               print MYFILE "References : $referenceid\n";
@@ -90,8 +100,8 @@ elsif ( $referenceid =~ /<(.*?)>/ ){
               print MYFILE "commit: $commitid\n\n";
               print MYFILE "$body_str";
               close (MYFILE);   
-              print " response \n";  
-              my $response =`git reviewmbox '$commitid'`;
+              print "This is a response \n";  
+              my $response =`git reviewmbox '$commitid' '$from' '$date' '$email'`;
               print $response;
             
           }

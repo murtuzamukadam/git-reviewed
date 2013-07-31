@@ -65,7 +65,12 @@ if commit_hash == "not match"
 else
 review_hash = make_review_mbox()  
 end
-
+author = ARGV[1]
+date = ARGV[2]
+email = ARGV[3]
+ENV['GIT_AUTHOR_NAME'] = author
+ENV['GIT_AUTHOR_EMAIL'] = email
+ENV['GIT_AUTHOR_DATE'] = date
 
 check_tree = `git ls-tree review`
 t="100644 blob #{review_hash}\t#{review_hash}"
