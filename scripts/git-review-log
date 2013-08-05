@@ -1,5 +1,16 @@
 #!/usr/bin/perl
 
+my $commithash = $ARGV[0];
+my $flag = 0; 
+
+
+if(length($commithash) != 0)
+ {
+   $flag =1;
+ } 
+
+
+OUTER:
 foreach my $rev (`git rev-list review --pretty=oneline`) {
    
   ($sha=$rev) =~ s/\s.*$//;
@@ -14,13 +25,20 @@ my @values = (split('\t', $blob))[2];
           my @values1 = (split('\/', $val1))[0];
            $val1 = (split('\/', $blob))[1];
          
-          print "\nReview ";
-         
-          print $val1;
+          
 
 
 foreach my $val (@values1) {
- 
+      
+
+    if($flag == 1 && $val!=$commithash) {
+            
+            next OUTER;
+  }
+        
+      print "\nReview ";
+         
+          print $val1;
       print "commit Reviewed ";
       print "$val\n";
  }
