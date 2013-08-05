@@ -30,8 +30,9 @@ my @values = (split('\t', $blob))[2];
 
 foreach my $val (@values1) {
       
+     
 
-    if($flag == 1 && $val!=$commithash) {
+    if($flag == 1 && $val ne $commithash) {
             
             next OUTER;
   }
