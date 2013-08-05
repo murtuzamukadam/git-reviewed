@@ -162,12 +162,14 @@ end
                
                 review_raw = ARGV[0]
               
-                get_tree = `git show #{review_raw}`
-                tree_hash= get_tree.lines.first
-                tree_hash= tree_hash.split[1] 
-                
-                reviewer_details = `git log -1 review  -- #{tree_hash}/#{review_raw}` 
-                puts "Commit Reviewed: #{tree_hash}"
+                checkcontents = `git review --log`
+  	        checkcontents= checkcontents.split(/\n/)
+                matched_rowindex=checkcontents.index("Review #{review_raw}")
+                commithash = checkcontents[matched_rowindex+1]
+                commithash = commithash.split[2]
+                reviewer_details = `git log -1 review  -- #{commithash}/#{review_raw}` 
+                puts "Commit Reviewed: #{commithash}"
+                 
                 print "Reviewer"
                 puts reviewer_details[54..-1]
                 review_show_raw= %x(git cat-file -p #{review_raw})
