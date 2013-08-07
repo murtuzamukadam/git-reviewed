@@ -96,9 +96,9 @@ end
 		review_log = `git review-log`
 		review_log = review_log.split(/\n/)[1]
 		review_hash = review_log.split[1]                        
-		cmd = `git show #{review_hash}`
+		cmd = `git review --show-raw #{review_hash}`
 		tree_hash= cmd.lines.first
-		tree_hash= tree_hash.split[1]             #Getting the tree the review belongs to
+		tree_hash= tree_hash.split[2]             #Getting the tree the review belongs to
 		value = `git show #{review_hash}`
 		amended_hash = make_review(value)
 		checkcontents = `git ls-tree review:#{tree_hash}`
@@ -185,9 +185,9 @@ end
                 end
                
                 review_respond = ARGV[0]  
-                get_tree = `git show #{review_respond}`
+                get_tree = `git review --show-raw #{review_respond}`
                 tree_hash= get_tree.lines.first
-                tree_hash= tree_hash.split[1] 
+                tree_hash= tree_hash.split[2] 
                 response=`git show #{review_respond}`
                 review_hash_respond = make_review(response) 
                 tree_contents_respond= `git ls-tree review:#{tree_hash}` 
