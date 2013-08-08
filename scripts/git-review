@@ -80,6 +80,7 @@ EOS
   opt :format, "Prepare reviews for email submissions"
   opt :push, "Updates remote repositories by adding reviews"
   opt :pull, "Fetches reviews from remote repositories" 
+  opt :display, "Displays the review properly"
 end
 
           if opts[:push] ==true  
@@ -151,6 +152,19 @@ end
                
 		review_comments=`git comment #{review_comments}`
                 print review_comments
+                exit 
+            elsif opts[:display]==true
+               
+
+                if ARGV.length ==0
+                 puts " --display needs a review hash. Check git review --help"
+                 exit
+                end
+               
+                review_display = ARGV[0] 
+               
+		review_display =`git display #{review_display}`
+                print review_display
                 exit 
 
             elsif opts[:show_raw]==true

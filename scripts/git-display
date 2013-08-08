@@ -1,0 +1,153 @@
+#!/usr/bin/env perl
+
+
+use strict;
+my $inside_diff = 0;
+my $pos = 1;
+my $comment;
+my $comment1;
+my $oldline;
+my $posnew;
+my $posold;
+my $review_hash = $ARGV[0];
+print "the review hash is $review_hash";
+my $show = `git review --show-raw $review_hash`;  
+
+
+open(my $info, '> /tmp/review1.tmp');
+print $info "$show";
+
+my $file = '/tmp/review1.tmp';
+open my $info1, $file or die "Could not open $file: $!";
+
+
+
+my $filenew = '/tmp/newfile.tmp';
+my $fileold = '/tmp/oldfile.tmp';
+
+open(my $fh, '>', $filenew) or die "Could not open file '$filenew' $!";
+
+open(my $fo, '>', $fileold) or die "Could not open file '$fileold' $!";
+my $old;
+my $new;
+
+;
+while(my $line = <$info1>) {
+       
+       
+        #$line =~ s/\>//g;
+         
+         
+        	if($line =~ /^>\@\@\s -(\d+)(\d+),(\d+)\s \+(\d+)(\d+),(\d+)/xms) {
+	 	$inside_diff = 1;
+              
+                $old = 0;
+                $new = 0;
+                
+	       
+         }
+	
+
+        if($line =~ /^>\@\@\s -(\d+)\s \+(\d+),(\d+)(\d+)/xms) {
+	 	$inside_diff = 1;
+              
+                $old = 0;
+                $new = 0;
+                
+	       
+         }
+
+        if($line =~ /^>\@\@\s -(\d+)(\d+),(\d+)(\d+)\s \+(\d+)(\d+),(\d+)/xms) {
+	 	$inside_diff = 1;
+              
+                $old = 0;
+                $new = 0;
+                
+	       
+         }
+	
+	elsif($inside_diff == 1 and $line =~ /^>\+/)  {
+                print $fh "$new";
+		$comment = $line;
+                
+                #print $fo "\n";
+                print $fh "$line"; 
+              
+                
+	}
+
+         elsif($inside_diff == 1 and $line =~ /^>\-/)  {
+                print $fo "$old";
+                
+		$comment = $line;
+             
+              print $fo "$line"; 
+               
+          
+	}
+        #include non comments
+         elsif($inside_diff == 1 and $line =~ /^>\s/)  {
+                print $fh "$new";
+                
+		$comment = $line;
+                 print $fh "$line";
+                  print $fo "$old";
+                 print $fo "$line"; 
+                 
+	}
+      #include comments
+
+       elsif($inside_diff ==1)
+      { 
+          
+         if($oldline=~ /^>\-/){ 
+                print $fo "\n";
+              print $fo "$line";
+               print $fo "\n";
+              
+            }
+         elsif($oldline=~ /^>\+/)  {
+                 
+                 print $fh "\n";
+                 print $fh "$line";
+                 print $fh "\n";
+            }
+         elsif($oldline=~ /^>\s/)  {
+                 print $fo "\n";
+                 print $fh "\n";
+                 print $fh "$line";
+                  print $fo "$line";
+                  print $fo "\n";
+                 print $fh "\n";
+       }
+         next;
+       }
+                
+
+
+  		if($inside_diff == 1 and $line =~ /^>\+/) {
+			$new ++
+		}
+		elsif($inside_diff == 1 and $line =~ /^>\-/) {
+			$old ++;
+		}
+		else {
+			$new ++;
+			$old++;
+		}
+
+      
+ #print $inside_diff;
+ $oldline=$line;
+}
+
+
+#system("git showgui");
+close $fh;
+close $fo;
+
+
+
+close(MYFILE);
+
+
