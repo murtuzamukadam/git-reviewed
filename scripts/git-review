@@ -189,6 +189,7 @@ end
                 tree_hash= get_tree.lines.first
                 tree_hash= tree_hash.split[2] 
                 response=`git show #{review_respond}`
+                response.gsub!(/^/, ">") 
                 review_hash_respond = make_review(response) 
                 tree_contents_respond= `git ls-tree review:#{tree_hash}` 
 	        tree_contents_respond = tree_contents_respond + "100644 blob #{review_hash_respond}\t#{review_hash_respond}"
