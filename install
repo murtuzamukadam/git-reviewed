@@ -27,4 +27,4 @@ chown root:root /usr/local/bin/git-reviewmbox
 
 mkdir -p /usr/local/share/man/man1
 gzip -c doc/git-review.1 > /usr/local/share/man/man1/git-review.1.gz
-chown root:root /usr/local/share/man/man1/git-review.1 
+chown root:root /usr/local/share/man/man1/git-review.1.gz 
