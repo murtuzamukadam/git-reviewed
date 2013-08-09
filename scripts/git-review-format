@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #!bin/sh
 
-puts "hello"
+
 review_hash=ARGV[0]
 show = `git review --show-raw #{review_hash}`
 
@@ -12,16 +12,17 @@ date = from[2]
 from =from[1].split(/:/)
 format = "From: " + from[1] +"\n"
 
+print format
+#subject = show.split(/@@/)
+#subject = subject[2].split(/\n/)
+#subject = subject[1]
 
-subject = show.split(/@@/)
-subject = subject[2].split(/\n/)
-subject = subject[1]
 
-
-format= format + "Subject: " + "[PATCH] " + subject + "\n"
+format= format + "Subject: " + "[PATCH] " + "\n"
 
 
 format= format + date + "\n\n---\n"
+
 find = `git review-log`
 find = find.split("\n").map {|row| row.split()}
 
@@ -45,6 +46,7 @@ format = format + stat + "\n"
 body = show.split(/commit\s\w{40}/)
 
 format = format + body[1] + "\n--\n"
+
 pwd = `pwd`
 puts pwd
 version = `git version`

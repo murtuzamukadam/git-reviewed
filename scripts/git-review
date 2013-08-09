@@ -80,6 +80,7 @@ EOS
   opt :format, "Prepare reviews for email submissions"
   opt :push, "Updates remote repositories by adding reviews"
   opt :pull, "Fetches reviews from remote repositories" 
+  opt :display, "Displays the review properly"
 end
 
           if opts[:push] ==true  
@@ -152,6 +153,19 @@ end
 		review_comments=`git comment #{review_comments}`
                 print review_comments
                 exit 
+            elsif opts[:display]==true
+               
+
+                if ARGV.length ==0
+                 puts " --display needs a review hash. Check git review --help"
+                 exit
+                end
+               
+                review_display = ARGV[0] 
+               
+		review_display =`git display #{review_display}`
+                print review_display
+                exit 
 
             elsif opts[:show_raw]==true
             
@@ -189,6 +203,7 @@ end
                 tree_hash= get_tree.lines.first
                 tree_hash= tree_hash.split[2] 
                 response=`git show #{review_respond}`
+                response.gsub!(/^/, ">") 
                 review_hash_respond = make_review(response) 
                 tree_contents_respond= `git ls-tree review:#{tree_hash}` 
 	        tree_contents_respond = tree_contents_respond + "100644 blob #{review_hash_respond}\t#{review_hash_respond}"
