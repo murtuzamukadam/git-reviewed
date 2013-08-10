@@ -3,6 +3,7 @@
 
 use strict;
 my $inside_diff = 0;
+my $counter = 0;
 my $pos = 1;
 my $comment;
 my $comment1;
@@ -38,9 +39,9 @@ while(my $line = <$info1>) {
         #$line =~ s/\>//g;
          
          
-        	if($line =~ /^>\@\@\s -(\d+)(\d+),(\d+)\s \+(\d+)(\d+),(\d+)/xms) {
+        	if($counter == 0 and $line =~ /^>\@\@\s -(\d+)(\d+),(\d+)\s \+(\d+)(\d+),(\d+)/xms) {
 	 	$inside_diff = 1;
-              
+                $counter =1; 
                 $old = 0;
                 $new = 0;
                 
@@ -48,24 +49,34 @@ while(my $line = <$info1>) {
          }
 	
 
-        if($line =~ /^>\@\@\s -(\d+)\s \+(\d+),(\d+)(\d+)/xms) {
+        if($counter == 0 and $line =~ /^>\@\@\s -(\d+)\s \+(\d+),(\d+)(\d+)/xms) {
 	 	$inside_diff = 1;
-              
+                $counter =1;
                 $old = 0;
                 $new = 0;
                 
 	       
          }
 
-        if($line =~ /^>\@\@\s -(\d+)(\d+),(\d+)(\d+)\s \+(\d+)(\d+),(\d+)/xms) {
+        if($counter == 0 and $line =~ /^>\@\@\s -(\d+)(\d+),(\d+)(\d+)\s \+(\d+)(\d+),(\d+)/xms) {
 	 	$inside_diff = 1;
-              
+                $counter =1;
                 $old = 0;
                 $new = 0;
                 
 	       
          }
-	
+
+      
+	 if($counter == 0 and $line =~ /^>\@\@\s -(\d+),(\d+)\s \+(\d+),(\d+)(\d+)(\d+)/xms) {
+	 	$inside_diff = 1;
+                $counter =1;
+                $old = 0;
+                $new = 0;
+                
+	       
+         }
+
 	elsif($inside_diff == 1 and $line =~ /^>\+/)  {
                 print $fh "$new";
 		$comment = $line;
@@ -139,6 +150,7 @@ while(my $line = <$info1>) {
       
  #print $inside_diff;
  $oldline=$line;
+$counter = 0;
 }
 
 
