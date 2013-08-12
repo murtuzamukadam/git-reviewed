@@ -12,7 +12,7 @@ width 80
   height 200
   borderwidth 1
   foreground 'dark green'
-  font TkFont.new('tahoma 12 bold')
+  font TkFont.new('tahoma 12')
    pack("side" => "left",  "padx"=> "5", "pady"=> "5")
 end
 
@@ -28,7 +28,7 @@ text = TkText.new(root) do
   borderwidth 1
   foreground 'red'
   
-  font TkFont.new('tahoma 12 bold')
+  font TkFont.new('tahoma 12')
    pack("side" => "right",  "padx"=> "5", "pady"=> "5")
 end
 
