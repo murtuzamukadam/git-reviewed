@@ -8,7 +8,7 @@ root = TkRoot.new { title "git-review" }
 ary=Array.new
 
 text = TkText.new(root) do
-width 100
+width 80
   height 200
   borderwidth 1
   foreground 'dark green'
@@ -23,7 +23,7 @@ text.insert 'end',line
 end
 
 text = TkText.new(root) do
-  width 100
+  width 80
   height 200
   borderwidth 1
   foreground 'red'

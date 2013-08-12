@@ -27,8 +27,8 @@ chown root:root /usr/local/bin/git-reviewmbox
 cp scripts/git-display /usr/local/bin/git-display
 chown root:root /usr/local/bin/git-display
 
-cp scripts/git-showgui /usr/local/bin/git-showgui
-chown root:root /usr/local/bin/git-showgui
+cp scripts/git-displaygui /usr/local/bin/git-displaygui
+chown root:root /usr/local/bin/git-displaygui
 
 mkdir -p /usr/local/share/man/man1
 gzip -c doc/git-review.1 > /usr/local/share/man/man1/git-review.1.gz

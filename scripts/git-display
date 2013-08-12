@@ -11,13 +11,13 @@ my $oldline;
 my $posnew;
 my $posold;
 my $review_hash = $ARGV[0];
-print "the review hash is $review_hash";
-my $show = `git review --show-raw $review_hash`;  
+
+my $show = `git show $review_hash`;  
 
 
 open(my $info, '> /tmp/review1.tmp');
 print $info "$show";
-
+close $info;
 my $file = '/tmp/review1.tmp';
 open my $info1, $file or die "Could not open $file: $!";
 
@@ -32,86 +32,154 @@ open(my $fo, '>', $fileold) or die "Could not open file '$fileold' $!";
 my $old;
 my $new;
 
-;
+my $value = 1;
 while(my $line = <$info1>) {
        
        
         #$line =~ s/\>//g;
          
-         
-        	if($counter == 0 and $line =~ /^>\@\@\s -(\d+)(\d+),(\d+)\s \+(\d+)(\d+),(\d+)/xms) {
-	 	$inside_diff = 1;
-                $counter =1; 
-                $old = 0;
-                $new = 0;
-                
-	       
-         }
-	
+         if ( $value == 1 and $line =~ /^From/)
+           {  $value = 0; 
+              print "this is linux review";
+              
 
-        if($counter == 0 and $line =~ /^>\@\@\s -(\d+)\s \+(\d+),(\d+)(\d+)/xms) {
-	 	$inside_diff = 1;
-                $counter =1;
-                $old = 0;
-                $new = 0;
-                
-	       
-         }
+          while(my $line = <$info1>) {
+               if ($line =~ /^diff/xms)
+  
+                   { 
+                     $inside_diff = 1;
+                     print $fh "-------------------------------------------------------\n";
+                     print $fo "-------------------------------------------------------\n";
+                      print $fh "-------------------------------------------------------\n";
+                     print $fo "-------------------------------------------------------\n";
+                     print $fh "$line"; 
+                     print $fo "$line"; 
+                    }
+               elsif ($line =~ /^index/xms) 
+                   {
+                     print $fh "$line"; 
+                     print $fo "$line"; 
+                    }
+  
+              elsif ($line =~ /^\-\-\-/xms) 
+                   {
+                     print $fh "$line"; 
+                     print $fo "$line"; 
+                    }
+  
 
-        if($counter == 0 and $line =~ /^>\@\@\s -(\d+)(\d+),(\d+)(\d+)\s \+(\d+)(\d+),(\d+)/xms) {
-	 	$inside_diff = 1;
-                $counter =1;
-                $old = 0;
-                $new = 0;
-                
-	       
-         }
+               elsif ($line =~ /^\+\+\+/xms) 
+                   { 
+                     print $fh "$line"; 
+                     print $fo "$line"; 
+                    }
+  
 
-      
-	 if($counter == 0 and $line =~ /^>\@\@\s -(\d+),(\d+)\s \+(\d+),(\d+)(\d+)(\d+)/xms) {
-	 	$inside_diff = 1;
-                $counter =1;
-                $old = 0;
-                $new = 0;
+                elsif ($line =~ /^\@\@/xms) 
+                   {
+                     print $fh "$line"; 
+                     print $fo "$line"; 
+                     print $fh "--\n";
+                     print $fo "--\n";
+                    }
                 
-	       
-         }
-
-	elsif($inside_diff == 1 and $line =~ /^>\+/)  {
-                print $fh "$new";
-		$comment = $line;
+               elsif($line =~ /^\+/)  {
                 
-                #print $fo "\n";
+		
+                
+                print $fo "\n";
                 print $fh "$line"; 
               
                 
 	}
 
-         elsif($inside_diff == 1 and $line =~ /^>\-/)  {
-                print $fo "$old";
+         elsif($line =~ /^\-/)  {
                 
-		$comment = $line;
-             
-              print $fo "$line"; 
+                
+		
+             print $fh "\n"; 
+            print $fo "$line"; 
                
           
 	}
-        #include non comments
-         elsif($inside_diff == 1 and $line =~ /^>\s/)  {
-                print $fh "$new";
+        elsif($line =~ /^\s/) { 
+          print $fo "$line"; 
+           print $fh "$line"; 
+          
+          }
+       }
+      }  	
+
+#--------------------------------------------------------------------------------------------------------
+           if($line =~ /^>diff/xms) {
+	 	
+                     $inside_diff = 1;
+                     print $fh "-------------------------------------------------------\n";
+                     print $fo "-------------------------------------------------------\n";
+                      print $fh "-------------------------------------------------------\n";
+                     print $fo "-------------------------------------------------------\n";
+                     print $fh "$line"; 
+                     print $fo "$line"; 
+                    }
+               elsif ($line =~ /^>index/xms) 
+                   {
+                     print $fh "$line"; 
+                     print $fo "$line"; 
+                    }
+  
+              elsif ($line =~ /^>\-\-\-/xms) 
+                   {
+                     print $fh "$line"; 
+                     print $fo "$line"; 
+                    }
+  
+
+               elsif ($line =~ /^>\+\+\+/xms) 
+                   { 
+                     print $fh "$line"; 
+                     print $fo "$line"; 
+                    }
+  
+
+                elsif ($line =~ /^>\@\@/xms) 
+                   {
+                     print $fh "$line"; 
+                     print $fo "$line"; 
+                     print $fh "--\n";
+                     print $fo "--\n";
+                    }
                 
-		$comment = $line;
-                 print $fh "$line";
-                  print $fo "$old";
-                 print $fo "$line"; 
-                 
+               elsif($line =~ /^>\+/)  {
+                
+		
+                
+                print $fo "\n\n";
+                print $fh "$line"; 
+              
+                
 	}
+
+         elsif($line =~ /^>\-/)  {
+                
+                
+		
+             print $fh "\n\n"; 
+            print $fo "$line"; 
+               
+          
+	}
+        elsif($line =~ /^>\s/) { 
+          print $fo "$line"; 
+           print $fh "$line"; 
+          
+          }
+      
+        	
       #include comments
 
-       elsif($inside_diff ==1)
-      { 
+       
           
-         if($oldline=~ /^>\-/){ 
+         elsif($oldline=~ /^>\-/){ 
                 print $fo "\n";
               print $fo "$line";
                print $fo "\n";
@@ -131,35 +199,21 @@ while(my $line = <$info1>) {
                   print $fo "\n";
                  print $fh "\n";
        }
-         next;
-       }
+         
                 
 
 
-  		if($inside_diff == 1 and $line =~ /^>\+/) {
-			$new ++
-		}
-		elsif($inside_diff == 1 and $line =~ /^>\-/) {
-			$old ++;
-		}
-		else {
-			$new ++;
-			$old++;
-		}
-
       
- #print $inside_diff;
+ 
  $oldline=$line;
-$counter = 0;
+
 }
 
 
-#system("git showgui");
+system("git displaygui");
 close $fh;
 close $fo;
-
-
-
+close $info1;
 close(MYFILE);
 
 
