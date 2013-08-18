@@ -3,16 +3,32 @@
 
 
 review_hash=ARGV[0]
-show = `git review --show-raw #{review_hash}`
+value = 1;
+show = `git show #{review_hash}`
+
+rev = show.split(/\n/)
+check = rev[0]
+
+if value == 1 and check =~ /^From/
+             $value = 0;
+              print "this is linux review"
+              format_linux = show
+             
 
 
+
+
+             
+else 
+    
+    show1= `git review --show-raw #{review_hash}`
 from = show.split(/\n/)
-date = from[2]
+
 
 from =from[1].split(/:/)
 format = "From: " + from[1] +"\n"
 
-print format
+
 #subject = show.split(/@@/)
 #subject = subject[2].split(/\n/)
 #subject = subject[1]
@@ -20,7 +36,9 @@ print format
 
 format= format + "Subject: " + "[PATCH] " + "\n"
 
+time1 = Time.new
 
+date = "Date: " + time1.inspect
 format= format + date + "\n\n---\n"
 
 find = `git review-log`
@@ -47,12 +65,13 @@ body = show.split(/commit\s\w{40}/)
 
 format = format + body[1] + "\n--\n"
 
-pwd = `pwd`
-puts pwd
+path = `pwd`
+puts path
 version = `git version`
 version= version.split(/git version/)
 format = format + version[1]
-#print format
-File.open("/home/m_mukadam/murtuzareview/#{review_hash}.patch", 'w') { |file| file.write(format) }
+File.open("/home/m_mukadam/git-review/#{review_hash}.patch", 'w') { |file| file.write(format) }
+end
+
 
 %x{gvim #{"/home/m_mukadam/murtuzareview/#{review_hash}.patch"}}

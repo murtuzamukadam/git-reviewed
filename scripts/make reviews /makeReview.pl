@@ -40,6 +40,7 @@ my $dbh = DBI->connect("dbi:SQLite:dbname=$dbName", '', '') or die "Cannot conne
               my ($tid, $commitid) = @$row;
               
               open (MYFILE, '> data.tmp');
+              print MYFILE "commit: $commitid\n\n";
               print MYFILE "From : $from\n";
               if ( $from =~ /<(.*?)>/ )
 		{
@@ -48,7 +49,7 @@ my $dbh = DBI->connect("dbi:SQLite:dbname=$dbName", '', '') or die "Cannot conne
 		}
               print MYFILE "Message-Id : <$thisid>\n";
               print MYFILE "Date : $date\n";
-              
+              print MYFILE "Subject: $subject\n";
               if(length($referenceid ne 0)) {
                   
                   print MYFILE "References: $referenceid\n";
@@ -57,9 +58,9 @@ my $dbh = DBI->connect("dbi:SQLite:dbname=$dbName", '', '') or die "Cannot conne
               if(length($replyto ne 0)) {
                   print MYFILE "$replyto\n";
                   }        
-              print MYFILE "Subject: $subject\n";
+              
               print MYFILE "Cc: $cc\n";
-              print MYFILE "commit: $commitid\n\n";
+             
               print MYFILE "$body_str";
               close (MYFILE); 
               print "This is a thread \n";
@@ -84,6 +85,7 @@ elsif ( $referenceid =~ /<(.*?)>/ ){
            if ($row) {
               my ($tid, $commitid) = @$row;
               open (MYFILE, '> data.tmp');
+              print MYFILE "commit: $commitid\n\n";
               print MYFILE "From : $from\n";
               if ( $from =~ /<(.*?)>/ )
 		{
@@ -91,13 +93,13 @@ elsif ( $referenceid =~ /<(.*?)>/ ){
     		  
 		}
               print MYFILE "Message-Id : <$thisid>\n";
-              
               print MYFILE "Date : $date\n";
+               print MYFILE "Subject: $subject\n";
               print MYFILE "$replyto\n";
               print MYFILE "References : $referenceid\n";
-              print MYFILE "Subject: $subject\n";
+             
               print MYFILE "Cc: $cc\n";
-              print MYFILE "commit: $commitid\n\n";
+              
               print MYFILE "$body_str";
               close (MYFILE);   
               print "This is a response \n";  

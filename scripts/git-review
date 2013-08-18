@@ -75,7 +75,7 @@ EOS
   opt :log, "Display log history for all reviews done" 
   opt :respond, "Respond to a review"
   opt :show_raw, "Display raw review contents"
-  opt :show_comments, "Displays the list of comments in a review object"
+  #opt :show_comments, "Displays the list of comments in a review object"
   opt :log_show, "Displays the log history for all reviews along with the raw content"
   opt :format, "Prepare reviews for email submissions"
   opt :push, "Updates remote repositories by adding reviews"
