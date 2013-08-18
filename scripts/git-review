@@ -116,8 +116,15 @@ end
            elsif opts[:log]==true
                 
            
+		 if ARGV.length ==0
 		review_log=`git review-log`
                 puts review_log
+                exit
+                end 
+               
+                commit_hash = ARGV[0]
+                format = `git review-log #{commit_hash}`
+                print format
                 exit 
                
           elsif opts[:format]==true
@@ -137,10 +144,17 @@ end
                
             elsif opts[:log_show]==true
                 
-		review_log_show=`git review-log-show`
+		
+                 if ARGV.length ==0
+		review_log_show =`git review-log-show`
                 puts review_log_show
                 exit
-                
+                end 
+               
+                commit_hash = ARGV[0]
+                format = `git review-log-show #{commit_hash}`
+                print format
+                exit 
            elsif opts[:show_comments]==true
                
 

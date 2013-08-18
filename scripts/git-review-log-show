@@ -22,7 +22,8 @@ my @values = (split('\t', $blob))[2];
   foreach my $val1 (@values) {
 
 
-         
+         my @values1 = (split('\/', $val1))[0];
+           $val1 = (split('\/', $blob))[1];
           
 
           
@@ -37,7 +38,7 @@ foreach my $val (@values1) {
        my @values1 = (split('\/', $val1))[0];
            $val1 = (split('\/', $blob))[1];
          
-          print "\n\n\nReview ";
+          print "\n\n----------------------------------------------------------\nReview ";
          
           print $val1;
           my $get_tree = `git cat-file -p $val1`;

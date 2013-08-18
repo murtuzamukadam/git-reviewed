@@ -8,7 +8,7 @@ if(length($commithash) != 0)
  {
    $flag =1;
  } 
-
+print $ARGV[0];
 
 OUTER:
 foreach my $rev (`git rev-list review --pretty=oneline`) {
