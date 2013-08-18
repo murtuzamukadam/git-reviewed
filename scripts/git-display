@@ -124,7 +124,7 @@ while(my $line = <$info1>) {
       }  	
 
 #--------------------------------------------------------------------------------------------------------
-           if($line =~ /^>diff/xms) {
+           if($line =~ /^>+diff/xms) {
 	 	
                      $inside_diff = 1;
                      print $fh "*****************************************************************\n";
@@ -134,27 +134,27 @@ while(my $line = <$info1>) {
                      print $fh "$line"; 
                      print $fo "$line"; 
                     }
-               elsif ($line =~ /^>index/xms) 
+               elsif ($line =~ /^>+index/xms) 
                    {
                      print $fh "$line"; 
                      print $fo "$line"; 
                     }
   
-              elsif ($line =~ /^>\-\-\-/xms) 
+              elsif ($line =~ /^>+\-\-\-/xms) 
                    {
                      print $fh "$line"; 
                      print $fo "$line"; 
                     }
   
 
-               elsif ($line =~ /^>\+\+\+/xms) 
+               elsif ($line =~ /^>+\+\+\+/xms) 
                    { 
                      print $fh "$line"; 
                      print $fo "$line"; 
                     }
   
 
-                elsif ($line =~ /^>\@\@/xms) 
+                elsif ($line =~ /^>+\@\@/xms) 
                    {
                      print $fh "$line"; 
                      print $fo "$line"; 
@@ -162,7 +162,7 @@ while(my $line = <$info1>) {
                      print $fo "--\n";
                     }
                 
-               elsif($line =~ /^>\+/)  {
+               elsif($line =~ /^>+\+/)  {
                 
 		
                 
@@ -174,7 +174,7 @@ print $fh "_____________________________________________________________________
                 
 	}
 
-         elsif($line =~ /^>\-/)  {
+         elsif($line =~ /^>+\-/)  {
                 
                 
 		
@@ -185,7 +185,7 @@ print $fo "_____________________________________________________________________
                
           
 	}
-        elsif($line =~ /^>\s/) { 
+        elsif($line =~ /^>+\s/) { 
           print $fo "$line"; 
 print $fo "__________________________________________________________________________________________________\n";
            print $fh "$line"; 
@@ -198,19 +198,19 @@ print $fh "_____________________________________________________________________
 
        
           
-         elsif($oldline=~ /^>\-/xms){ 
+         elsif($oldline=~ /^>+\-/xms){ 
                 print $fo "\n";
               print $fo "$line";
                print $fo "\n";
               
             }
-         elsif($oldline=~ /^>\+/xms)  {
+         elsif($oldline=~ /^>+\+/xms)  {
                  
                  print $fh "\n";
                  print $fh "$line";
                  print $fh "\n";
             }
-         elsif($oldline=~ /^>\s/xms)  {
+         elsif($oldline=~ /^>+\s/xms)  {
                  print $fo "\n";
                  print $fh "\n";
                  print $fh "$line";

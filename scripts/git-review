@@ -81,6 +81,7 @@ EOS
   opt :push, "Updates remote repositories by adding reviews"
   opt :pull, "Fetches reviews from remote repositories" 
   opt :display, "Displays the review properly"
+  opt :rm, "Deletes the review"
 end
 
           if opts[:push] ==true  
@@ -165,6 +166,26 @@ end
                
 		review_display =`git display #{review_display}`
                 print review_display
+                exit 
+
+              elsif opts[:rm]==true
+               
+
+                if ARGV.length ==0
+                 puts " --display needs a review hash. Check git review --help"
+                 exit
+                end
+               
+                review_del = ARGV[0] 
+               
+		get_tree = `git review --show-raw #{review_del}`
+                tree_hash= get_tree.lines.first
+                tree_hash= tree_hash.split[2] 
+                puts tree_hash
+                tree_contents_rm= `git ls-tree review:#{tree_hash}`
+                
+                tree_contents = tree_contents_rm.delete!"100644 blob #{review_del}\t#{review_del}"
+                puts tree_contents
                 exit 
 
             elsif opts[:show_raw]==true
