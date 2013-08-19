@@ -2,13 +2,13 @@
 
 my $commithash = $ARGV[0];
 my $flag = 0; 
-
+my $log = '';
 
 if(length($commithash) != 0)
  {
    $flag =1;
  } 
-print $ARGV[0];
+
 
 OUTER:
 foreach my $rev (`git rev-list review --pretty=oneline`) {
@@ -36,11 +36,15 @@ foreach my $val (@values1) {
             
             next OUTER;
   }
-        
+      $log = $log."\nReview ";
       print "\nReview ";
-         
-          print $val1;
+        
+         $log = $log."$val1";  
+        print $val1;
+
+      $log = $log."commit Reviewed  "; 
       print "commit Reviewed ";
+      $log = $log."$val\n"; 
       print "$val\n";
  }
 
@@ -56,22 +60,35 @@ foreach my $val (@values1) {
    my $log_response = (split('Response to', $log))[1];
    my $removemessage = (split('\n\n', $log))[0];
    
-  
+  $log = $log."$removemessage\n";
    print "$removemessage\n";
    
    if($log_amend)
     {
+
+      $log = $log."Amended Review";
       print "Amended Review"; 
-       print "$log_amend";
+     $log = $log."$log_amend";      
+      print "$log_amend";
     }
    
 
     
    if($log_response)
     {
-      print "Response to"; 
+       $log = $log."Response to";
+      print "Response to";
+       $log = $log."$log_response"; 
        print "$log_response";
     }
     
    
 }
+
+if ($log eq "")
+ {
+   
+   print "fatal: bad revision $commithash\n";
+   exit;
+ }
+

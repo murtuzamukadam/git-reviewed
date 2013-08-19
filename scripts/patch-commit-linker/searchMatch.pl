@@ -57,7 +57,7 @@ while (<>) {
     } elsif (/^\+(.+)$/ and $file ne '') {
 	Do_Matching_Line('+', $1);
     } else {
-	die if /^Message-ID/i;
+	#die if /^Message-ID/i;
 	;
     }
 }
@@ -78,12 +78,16 @@ sub Report
 	foreach my $c (@bestCids) {
 	    my $count = Count_Lines_In_Commit($c);
 	    if ($count <= $total) {
-		print "    $c -> $cids{$c};", $count, ";\n";
+		print "    commit: $c -> $cids{$c};", $count, ";\n";
 	    }
+            else {
+                print "    commit: not match\n";
+             }       
 	}
 	foreach my $m (@noMatches) {
 	    print " not match [$m]\n";
 	}
+        
     }
 }
 
