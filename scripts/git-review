@@ -123,6 +123,8 @@ end
                 end 
                
                 commit_hash = ARGV[0]
+                commit_hash = `git rev-parse #{commit_hash}`
+                commit_hash = commit_hash.strip
                 format = `git review-log #{commit_hash}`
                 print format
                 exit 
@@ -136,7 +138,8 @@ end
                 end
                
                 review_format = ARGV[0] 
-               
+                review_format = `git rev-parse #{review_format}`
+                review_format = review_format.strip
 		format =`git review-format #{review_format}`
                 print format
                 exit 
@@ -152,22 +155,24 @@ end
                 end 
                
                 commit_hash = ARGV[0]
+                commit_hash = `git rev-parse #{commit_hash}`
+                commit_hash = commit_hash.strip
                 format = `git review-log-show #{commit_hash}`
                 print format
                 exit 
-           elsif opts[:show_comments]==true
+           #elsif opts[:show_comments]==true
                
 
-                if ARGV.length ==0
-                 puts " --show-comments needs a review hash. Check git review --help"
-                 exit
-                end
+            #    if ARGV.length ==0
+             #    puts " --show-comments needs a review hash. Check git review --help"
+              #   exit
+               # end
                
-                review_comments = ARGV[0] 
+                #review_comments = ARGV[0] 
                
-		review_comments=`git comment #{review_comments}`
-                print review_comments
-                exit 
+		#review_comments=`git comment #{review_comments}`
+                #print review_comments
+                #exit 
             elsif opts[:display]==true
                
 
@@ -177,7 +182,8 @@ end
                 end
                
                 review_display = ARGV[0] 
-               
+                review_display = `git rev-parse #{review_display}`
+                review_display = review_display.strip
 		review_display =`git display #{review_display}`
                 print review_display
                 exit 
@@ -191,7 +197,8 @@ end
                 end
                
                 review_del = ARGV[0] 
-               
+                review_del = `git rev-parse #{review_del}`
+                review_del = review_del.strip
 		get_tree = `git review --show-raw #{review_del}`
                 tree_hash= get_tree.lines.first
                 tree_hash= tree_hash.split[2] 
@@ -199,24 +206,24 @@ end
                 tree_contents_rm= `git ls-tree review:#{tree_hash}`
                 
                               
-         checkreviewcontents= tree_contents_rm.split("\n").map {|row| row.split()}
-  	matched_rowindex=checkreviewcontents.find_index {|row| row[3]==review_del }
+              checkreviewcontents= tree_contents_rm.split("\n").map {|row| row.split()}
+  	      matched_rowindex=checkreviewcontents.find_index {|row| row[3]==review_del }
     
-        if matched_rowindex == nil
-            puts "Review not found"
-            exit
-            end
-        checkreviewcontents.delete_at(matched_rowindex)  
-        checkreviewcontents=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line[3]}.join "\n" 
+              if matched_rowindex == nil
+                  puts "Review not found"
+                  exit
+              end
+             checkreviewcontents.delete_at(matched_rowindex)  
+             checkreviewcontents=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line [3]}.join "\n" 
   	
-     tree_hashT2 = create_treeT2(checkreviewcontents)    
-     tree_contentsT1 = search(tree_hash,tree_hashT2)
-     tree_hashT1 = create_treeT1(tree_contentsT1)
-     message= "Review #{review_del} has been deleted"
-     command= "git commit-tree #{tree_hashT1} -p review "
-     commit_tree(tree_hashT1,message,command)
+              tree_hashT2 = create_treeT2(checkreviewcontents)    
+               tree_contentsT1 = search(tree_hash,tree_hashT2)
+              tree_hashT1 = create_treeT1(tree_contentsT1)
+              message= "Review #{review_del} has been deleted"
+              command= "git commit-tree #{tree_hashT1} -p review "
+              commit_tree(tree_hashT1,message,command)
 
-        exit
+               exit
 
                    
             elsif opts[:show_raw]==true
@@ -227,7 +234,8 @@ end
                 end
                
                 review_raw = ARGV[0]
-              
+                review_raw = `git rev-parse #{review_raw}`
+                review_raw = review_raw.strip
                 checkcontents = `git review --log`
   	        checkcontents= checkcontents.split(/\n/)
                 matched_rowindex=checkcontents.index("Review #{review_raw}")
@@ -250,7 +258,9 @@ end
                  exit
                 end
                
-                review_respond = ARGV[0]  
+                review_respond = ARGV[0] 
+                review_respond = `git rev-parse #{review_respond}`
+                review_respond = review_respond.strip 
                 get_tree = `git review --show-raw #{review_respond}`
                 tree_hash= get_tree.lines.first
                 tree_hash= tree_hash.split[2] 
@@ -271,7 +281,12 @@ end
 
 if ARGV.length == 1 
   commit_hash = ARGV[0]
+  commit_hash = `git rev-parse #{commit_hash}`
+  
+  commit_hash = commit_hash.strip
+  
   cmd = "git log -u -1 #{commit_hash}"
+  
 else
   cmd = "git diff "
   
