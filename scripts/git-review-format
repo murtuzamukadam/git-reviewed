@@ -7,16 +7,19 @@ value = 1;
 show = `git show #{review_hash}`
 
 rev = show.split(/\n/)
-check = rev[0]
+check = rev[2]
+
 
 if value == 1 and check =~ /^From/
              $value = 0;
-              print "this is linux review"
+            
               format_linux = show
-             
+              subject = rev[5]
+              subject = subject.split(/Subject:/)
+             File.open("/home/m_mukadam/git-review/#{subject}.patch", 'w') { |file| file.write(format_linux) }
 
 
-
+           
 
              
 else 
@@ -71,7 +74,8 @@ version = `git version`
 version= version.split(/git version/)
 format = format + version[1]
 File.open("/home/m_mukadam/git-review/#{review_hash}.patch", 'w') { |file| file.write(format) }
+
+%x{gvim #{"/home/m_mukadam/git-review/#{review_hash}.patch"}}
 end
 
 
-%x{gvim #{"/home/m_mukadam/murtuzareview/#{review_hash}.patch"}}
