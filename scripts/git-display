@@ -40,7 +40,7 @@ while(my $line = <$info1>) {
          
          if ( $value == 1 and $line =~ /^From/)
            {  $value = 0; 
-              print "this is linux review";
+             
               
 
           while(my $line = <$info1>) {
