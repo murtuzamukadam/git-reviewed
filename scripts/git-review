@@ -195,13 +195,30 @@ end
 		get_tree = `git review --show-raw #{review_del}`
                 tree_hash= get_tree.lines.first
                 tree_hash= tree_hash.split[2] 
-                puts tree_hash
+                
                 tree_contents_rm= `git ls-tree review:#{tree_hash}`
                 
-                tree_contents = tree_contents_rm.delete!"100644 blob #{review_del}\t#{review_del}"
-                puts tree_contents
-                exit 
+                              
+         checkreviewcontents= tree_contents_rm.split("\n").map {|row| row.split()}
+  	matched_rowindex=checkreviewcontents.find_index {|row| row[3]==review_del }
+    
+        if matched_rowindex == nil
+            puts "Review not found"
+            exit
+            end
+        checkreviewcontents.delete_at(matched_rowindex)  
+        checkreviewcontents=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line[3]}.join "\n" 
+  	
+     tree_hashT2 = create_treeT2(checkreviewcontents)    
+     tree_contentsT1 = search(tree_hash,tree_hashT2)
+     tree_hashT1 = create_treeT1(tree_contentsT1)
+     message= "Review #{review_del} has been deleted"
+     command= "git commit-tree #{tree_hashT1} -p review "
+     commit_tree(tree_hashT1,message,command)
 
+        exit
+
+                   
             elsif opts[:show_raw]==true
             
                 if ARGV.length ==0
