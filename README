@@ -6,3 +6,12 @@ To have git-review installed on your machine:
 4) Start reviewing
 5) Use git-review --pull inorder to pull all the reviews made in a repository
 6) Use git-review --push to push the reviews onto the repository 
+
+*git-review runs a bunch of perl and ruby scripts. The following libraries are made use of in the scripts.
+ Please ensure you have these installed on the target machines.
+
+**tk toolkit for ruby:  $ sudo apt-get install libtcltk-ruby 
+**trollop command line option parser for ruby: gem install trollop
+
+
+*git-review uses a standard text editor gvim : sudo apt-get install vim-gnome
