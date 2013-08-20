@@ -1,0 +1,53 @@
+>diff --git a/scripts/git-review b/scripts/git-review
+>index d6fb072..2a9a47d 100755
+>--- a/scripts/git-review
+>+++ b/scripts/git-review
+>@@ -116,8 +116,15 @@ end
+>            elsif opts[:log]==true
+>                 
+>            
+>+		 if ARGV.length ==0
+> 		review_log=`git review-log`
+>                 puts review_log
+>+                exit
+>+                end 
+
+This indentation is confusing.
+
+>+               
+>+                commit_hash = ARGV[0]
+>+                format = `git review-log #{commit_hash}`
+>+                print format
+>                 exit 
+>                
+>           elsif opts[:format]==true
+>@@ -137,10 +144,17 @@ end
+>                
+>             elsif opts[:log_show]==true
+>                 
+>-		review_log_show=`git review-log-show`
+>+		
+>+                 if ARGV.length ==0
+>+		review_log_show =`git review-log-show`
+
+This indentation is confusing.
+
+>+                commit_hash = ARGV[0]
+>+                format = `git review-log-show #{commit_hash}`
+
+It might be a good idea to strip commit hash with commit_hash.strip() to avoid
+problems with whitespace.
+
+>diff --git a/scripts/git-review-log-show b/scripts/git-review-log-show
+>index 9dd2f7a..f661769 100755
+>--- a/scripts/git-review-log-show
+>+++ b/scripts/git-review-log-show
+>@@ -22,7 +22,8 @@ my @values = (split('\t', $blob))[2];
+>   foreach my $val1 (@values) {
+> 
+> 
+>-         
+>+         my @values1 = (split('\/', $val1))[0];
+>+           $val1 = (split('\/', $blob))[1];
+
+Confusing indentation.
