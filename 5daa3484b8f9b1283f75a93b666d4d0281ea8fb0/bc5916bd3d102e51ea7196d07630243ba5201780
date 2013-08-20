@@ -1,0 +1,19 @@
+>commit 5daa3484b8f9b1283f75a93b666d4d0281ea8fb0
+>Author: Murtuza Mukadam <murtuza16289@gmail.com>
+>Date:   Mon Aug 19 15:05:48 2013 -0400
+>
+>    removing comment
+>
+>diff --git a/scripts/git-display b/scripts/git-display
+>index 71f76ef..59d4426 100755
+>--- a/scripts/git-display
+>+++ b/scripts/git-display
+>@@ -40,7 +40,7 @@ while(my $line = <$info1>) {
+>          
+>          if ( $value == 1 and $line =~ /^From/)
+>            {  $value = 0; 
+>-              print "this is linux review";
+>+             
+>               
+> 
+>           while(my $line = <$info1>) {
