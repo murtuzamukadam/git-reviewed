@@ -303,9 +303,14 @@ end
 value.gsub!(/^/, ">")           #putting in chevrons at the beginning of every line
 review_hash = make_review(value)  
 
+stdin, stdout, stderr = Open3.popen3("git ls-tree review")
+  	
+  	
+  	check_tree = stdout.read()
+  	error = stderr.read()
+	
 
 
-check_tree = `git ls-tree review`
 t="100644 blob #{review_hash}\t#{review_hash}"
 
 
