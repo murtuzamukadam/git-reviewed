@@ -285,7 +285,7 @@ if ARGV.length == 1
   
   commit_hash = commit_hash.strip
   
-  cmd = "git log -u -1 #{commit_hash}"
+  cmd = "git log -u -1 #{commit_hash} --"
   
 else
   cmd = "git diff "

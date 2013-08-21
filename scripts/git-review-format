@@ -16,9 +16,11 @@ if value == 1 and check =~ /^From/
               format_linux = show
               subject = rev[5]
               subject = subject.split(/Subject:/)
-             File.open("/home/m_mukadam/git-review/#{subject}.patch", 'w') { |file| file.write(format_linux) }
+               path = `pwd`
+               path = path.strip
+             File.open("#{path}/#{subject}.patch", 'w') { |file| file.write(format_linux) }
 
-
+                  %x{gvim #{"#{path}/#{review_hash}.patch"}}
            
 
              
@@ -69,13 +71,14 @@ body = show.split(/commit\s\w{40}/)
 format = format + body[1] + "\n--\n"
 
 path = `pwd`
-puts path
+path = path.strip
+
 version = `git version`
 version= version.split(/git version/)
 format = format + version[1]
-File.open("/home/m_mukadam/git-review/#{review_hash}.patch", 'w') { |file| file.write(format) }
+File.open("#{path}/#{review_hash}.patch", 'w') { |file| file.write(format) }
 
-%x{gvim #{"/home/m_mukadam/git-review/#{review_hash}.patch"}}
+%x{gvim #{"#{path}/#{review_hash}.patch"}}
 end
 
 
