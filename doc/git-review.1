@@ -16,76 +16,84 @@ Allows the user to make a review on a given commit hash\.
 .
 .SH "OPTIONS"
 .TP
-\fB<log>\fR
+\fB--init\fR
+.
+.P
+Initializes git-review inorder to start reviewing.
+.
+.P
+\fB--pull\fR
+.
+.P
+Fetches reviews from remote repositories.
+.
+.P
+\fB--push\fR
+.
+.P
+Updates remote repositories by adding reviews.
+.
+.P
+\fB--log\fR
 .
 .P
 Shows the log history of the reviews made along with the reviewer details.
 .
 .P
-\fB<log>\fR commit-hash
+\fB--log\fR=\fIcommit-hash\fR
 .
 .P
 Shows the log history of the reviews made along with the reviewer details for a particular commit.
 .
 .P
-\fB<log-show>\fR
+\fB--log-show\fR
 .
 .P
 Shows the log history of the reviews made along with raw review content.
 .
 .P
-\fB<log-show>\fR commit-hash
+\fB--log-show\fR=\fIcommit-hash\fR
 .
 .P
 Shows the log history of the reviews made along with raw review content for a particular commit.
 .
 .P
-\fB<amend>\fR
+\fB--amend\fR
 .
 .P
 Allows reviewer to make any change to the last review.
 .
 .P
-\fB<show-raw>\fR review-hash
+\fB--show-raw\fR=\fIreview-hash\fR
 .
 .P
 Shows the contents of the review object.
 .
 .P
-\fB<format>\fR review-hash
+\fB--format\fR=\fIreview-hash\fR
 .
 .P
-Prepares the review for an email submission
+Prepares the review for an email submission.
 .
 .P
-\fB<respond>\fR review-hash
+\fB--respond\fR=\fIreview-hash\fR
 .
 .P
-Allows reviewer to respond to any review
+Allows reviewer to respond to any review.
 .
 .P
-\fB<display>\fR review-hash
+\fB--display\fR=\fIreview-hash\fR
 .
 .P
-Displays the interleaved history in a window
+Displays the interleaved history in a window.
 .
 .P
-\fB<rm>\fR review-hash
+\fB--rm\fR=\fIreview-hash\fR
 .
 .P
-Deletes the review
+Deletes the review.
 .
 .P
-\fB<pull>\fR
-.
-.P
-Fetches reviews from remote repositories
-.
-.P
-\fB<push>\fR
-.
-.P
-Updates remote repositories by adding reviews
 .
 .P
 .SH "EXAMPLES"
