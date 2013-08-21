@@ -70,7 +70,7 @@ Creates a review object on a commit
 
 
 EOS
-
+  opt :init, "Initialize the repository to start reviewing" 
   opt :amend, "Change the last review committed"
   opt :log, "Display log history for all reviews done" 
   opt :respond, "Respond to a review"
@@ -83,8 +83,23 @@ EOS
   opt :display, "Displays the review properly"
   opt :rm, "Deletes the review"
 end
+          if opts[:init] ==true
+               
+            stdin, stdout, stderr = Open3.popen3("git branch --track review origin/review")
+  	
+  	    check_remote_branch = stdout.read()
+  	    error = stderr.read().strip
+            
+	    error1= "fatal: A branch named 'review' already exists."
+            error2= "fatal: Not a valid object name: 'origin/review'."
+                    
 
-          if opts[:push] ==true  
+
+            if error == error1.strip || error ==error2.strip 
+               end
+            puts "git-review ready to use"
+               exit
+          elsif opts[:push] ==true  
 
                 `git push origin review:review`
                  exit
