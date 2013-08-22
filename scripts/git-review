@@ -113,8 +113,8 @@ end
                  `git remote add rwd .git/review-workingdir`
                    #that to create a remote pointing to it
 
-                  `git fetch origin review`
-                  `git branch -f origin/review FETCH_HEAD`
+                  `git fetch origin review:origin/review`
+
                   `git push -f rwd origin/review:origin/review`
                    #to push the origin/review branch to that repository
                    
