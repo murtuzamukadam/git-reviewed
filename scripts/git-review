@@ -118,7 +118,9 @@ end
                   `git push -f rwd origin/review:origin/review`
                    #to push the origin/review branch to that repository
                    
-                   `git --git-dir=.git/review-workingdir/.git merge origin/review`
+                   Dir.chdir('.git/review-workingdir/')
+                   `git merge origin/review`
+                   Dir.chdir('../../')
                    `git fetch rwd`
                    `git branch -f review rwd/review` 
                    `git remote rm rwd`
