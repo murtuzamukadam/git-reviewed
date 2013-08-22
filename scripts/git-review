@@ -114,6 +114,7 @@ end
                    #that to create a remote pointing to it
 
                   `git fetch origin review`
+                  `git branch review FETCH_HEAD`
                   `git push -f rwd origin/review:origin/review`
                    #to push the origin/review branch to that repository
                    
