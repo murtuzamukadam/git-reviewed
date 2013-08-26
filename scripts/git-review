@@ -149,10 +149,11 @@ end
 
            elsif opts[:log]==true
                 
-           
+               
 		 if ARGV.length ==0
 		review_log=`git review-log`
-                puts review_log
+                IO.popen("less", "w") { |f| f.puts review_log}
+                
                 exit
                 end 
                
@@ -160,7 +161,7 @@ end
                 commit_hash = `git rev-parse #{commit_hash}`
                 commit_hash = commit_hash.strip
                 format = `git review-log #{commit_hash}`
-                print format
+                 IO.popen("less", "w") { |f| f.puts format}
                 exit 
                
           elsif opts[:format]==true
