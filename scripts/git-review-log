@@ -52,17 +52,24 @@ foreach my $val (@values1) {
 }
   
   }
-   
+   $sha =~ s/^\s+//;
+	$sha =~ s/\s+$//;
    my $log = `git log -1 $sha`;
-
+   
    
    my $log_amend = (split('Amended Review', $log))[1];
    my $log_response = (split('Response to', $log))[1];
    my $removemessage = (split('\n\n', $log))[0];
    
   $log = $log."$removemessage\n";
-   print "$removemessage\n";
-   
+  
+  $removecheck = (split('Merge:', $removemessage))[1];
+  
+  if(length($removecheck) == 0)
+
+  {  print "$removemessage\n"; 
+    
+   }
    if($log_amend)
     {
 
