@@ -17,14 +17,15 @@ height = TkWinfo.screenheight root
   font TkFont.new('tahoma 12')
    pack("side" => "left",  "padx"=> "5", "pady"=> "5")
 end
-
+ 
 
 f.each_line do |line|
 text.insert 'end',line
 
 end
 
-text = TkText.new(root) do
+
+text1 = TkText.new(root) do
 
   width = TkWinfo.screenwidth root
 height = TkWinfo.screenheight root
@@ -33,12 +34,27 @@ height = TkWinfo.screenheight root
   
   font TkFont.new('tahoma 12')
    pack("side" => "right",  "padx"=> "5", "pady"=> "5")
+
 end
 
 
 r.each_line do |line|
-text.insert 'end',line
+text1.insert 'end',line
 
 end
+scroll_bar1 = TkScrollbar.new(root, 'orient'=>'ver', 
+             'command' => proc { |*args| text1.yview *args}) 
+scroll_bar1.pack('side' => 'right', 'fill' => 'y') 
+text1.yscrollcommand(proc { |first,last| 
+                                  scroll_bar1.set(first,last) })
+scroll_bar = TkScrollbar.new(root, 'orient'=>'ver', 
+             'command' => proc { |*args| text.yview *args}) 
+scroll_bar.pack('side' => 'left', 'fill' => 'y') 
+text.yscrollcommand(proc { |first,last| 
+                                  scroll_bar.set(first,last) })
 
+text.pack("fill"=>"y")
+text.pack("expand"=>true)
+text1.pack("fill"=>"y")
+text1.pack("expand"=>true)
 Tk.mainloop
