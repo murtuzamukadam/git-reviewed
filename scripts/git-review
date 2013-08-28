@@ -75,7 +75,6 @@ EOS
   opt :log, "Display log history for all reviews done" 
   opt :respond, "Respond to a review"
   opt :show_raw, "Display raw review contents"
-  #opt :show_comments, "Displays the list of comments in a review object"
   opt :log_show, "Displays the log history for all reviews along with the raw content"
   opt :format, "Prepare reviews for email submissions"
   opt :push, "Updates remote repositories by adding reviews"
@@ -185,29 +184,17 @@ end
 		
                  if ARGV.length ==0
 		review_log_show =`git review-log-show`
-                puts review_log_show
+                IO.popen("less", "w") { |f| f.puts review_log_show}
                 exit
                 end 
                
                 commit_hash = ARGV[0]
                 commit_hash = `git rev-parse #{commit_hash}`
                 commit_hash = commit_hash.strip
-                format = `git review-log-show #{commit_hash}`
-                print format
+                review_log_show = `git review-log-show #{commit_hash}`
+                IO.popen("less", "w") { |f| f.puts review_log_show}
                 exit 
-           #elsif opts[:show_comments]==true
-               
-
-            #    if ARGV.length ==0
-             #    puts " --show-comments needs a review hash. Check git review --help"
-              #   exit
-               # end
-               
-                #review_comments = ARGV[0] 
-               
-		#review_comments=`git comment #{review_comments}`
-                #print review_comments
-                #exit 
+           
             elsif opts[:display]==true
                
 
@@ -277,13 +264,11 @@ end
                 commithash = checkcontents[matched_rowindex+1]
                 commithash = commithash.split[2]
                 reviewer_details = `git log -1 review  -- #{commithash}/#{review_raw}` 
-                puts "Commit Reviewed: #{commithash}"
-                 
-                print "Reviewer"
-                puts reviewer_details[54..-1]
+                raw = "Commit Reviewed: #{commithash}\nReviewer "
+                raw=raw + reviewer_details[54..-1]
                 review_show_raw= %x(git cat-file -p #{review_raw})
-                puts review_show_raw
-                 
+                raw = raw + review_show_raw
+                IO.popen("less", "w") { |f| f.puts raw}
                 exit
 
             elsif opts[:respond]==true
