@@ -5,80 +5,53 @@
 review_hash=ARGV[0]
 value = 1;
 show = `git show #{review_hash}`
-
 rev = show.split(/\n/)
-check = rev[2]
+check = rev[0]
 
 
 if value == 1 and check =~ /^From/
-             $value = 0;
-            
-              format_linux = show
-              subject = rev[5]
-              subject = subject.split(/Subject:/)
-               path = `pwd`
-               path = path.strip
-             File.open("#{path}/#{subject}.patch", 'w') { |file| file.write(format_linux) }
-
-                  %x{gvim #{"#{path}/#{review_hash}.patch"}}
+              
+         $value = 0;
+         format_linux = show
+         subject = rev[3]
+         subject = subject.split(/Subject:/)
+         path = `pwd`
+         path = path.strip
+         File.open("#{path}/#{subject}.patch", 'w') { |file| file.write(format_linux) }
+         %x{gvim #{"#{path}/#{review_hash}.patch"}}
            
 
              
 else 
     
-    show1= `git review --show-raw #{review_hash}`
-from = show.split(/\n/)
-
-
-from =from[1].split(/:/)
-format = "From: " + from[1] +"\n"
-
-
-#subject = show.split(/@@/)
-#subject = subject[2].split(/\n/)
-#subject = subject[1]
-
-
-format= format + "Subject: " + "[PATCH] " + "\n"
-
-time1 = Time.new
-
-date = "Date: " + time1.inspect
-format= format + date + "\n\n---\n"
-
-find = `git review-log`
-find = find.split("\n").map {|row| row.split()}
-
-matched_rowindex=find.find_index {|row| row[1]==review_hash}
-
-matched_rowindex=matched_rowindex + 2
-
-
-commit = find[matched_rowindex][1]
-
-
-stat = `git log --stat -1 #{commit}`
-stat= stat.split(/\n/)
-length = stat.length
-stat = stat[6..length]
-stat = stat.join("\n") 
-
-
-format = format + stat + "\n"
-
-body = show.split(/commit\s\w{40}/)
-
-format = format + body[1] + "\n--\n"
-
-path = `pwd`
-path = path.strip
-
-version = `git version`
-version= version.split(/git version/)
-format = format + version[1]
-File.open("#{path}/#{review_hash}.patch", 'w') { |file| file.write(format) }
-
-%x{gvim #{"#{path}/#{review_hash}.patch"}}
+        show1= `git review --show-raw #{review_hash}`
+        from = show.split(/\n/)
+        from =from[1].split(/:/)
+        format = "From: " + from[1] +"\n"
+	format= format + "Subject: " + "[PATCH] " + "\n"
+	time1 = Time.new
+	date = "Date: " + time1.inspect
+	format= format + date + "\n\n---\n"
+	find = `git review-log`
+	find = find.split("\n").map {|row| row.split()}
+	matched_rowindex=find.find_index {|row| row[1]==review_hash}
+	matched_rowindex=matched_rowindex + 2
+	commit = find[matched_rowindex][1]
+	stat = `git log --stat -1 #{commit}`
+	stat= stat.split(/\n/)
+	length = stat.length
+	stat = stat[6..length]
+	stat = stat.join("\n") 
+	format = format + stat + "\n"
+	body = show.split(/commit\s\w{40}/)
+	format = format + body[1] + "\n--\n"
+	path = `pwd`
+	path = path.strip
+	version = `git version`
+	version= version.split(/git version/)
+	format = format + version[1]
+	File.open("#{path}/#{review_hash}.patch", 'w') { |file| file.write(format) }
+	%x{gvim #{"#{path}/#{review_hash}.patch"}}
 end
 
 

@@ -2,9 +2,8 @@
 require 'rubygems'
 require "trollop"
 require "open3"
+require 'tempfile'
 include Open3
-
-
 
 def make_review(value)
 	
@@ -41,6 +40,7 @@ def create_treeT1(createT1)
         return tree_hashT1
 end
 
+
 def commit_tree(tree_hashT1,commit_message,command)
   	stdin,stdout, stderr = Open3.popen3(command)
    	stdin.write commit_message
@@ -50,6 +50,7 @@ def commit_tree(tree_hashT1,commit_message,command)
    	createreviewbranch = ` git branch -f review #{commit_treeT1}`
 end
 
+
 def search(commit_hash,tree_hashT2)
 
 	checkreviewcontents = `git ls-tree review  `
@@ -58,7 +59,7 @@ def search(commit_hash,tree_hashT2)
   	checkreviewcontents[matched_rowindex][2]= tree_hashT2
   	tree_contentsT1=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line[3]}.join "\n"
         return tree_contentsT1
-  end 	
+end 	
 
 
 
@@ -66,7 +67,7 @@ def search(commit_hash,tree_hashT2)
 opts = Trollop::options do
   
   banner <<-EOS
-Creates a review object on a commit
+  Creates a review object on a commit
 
 
 EOS
@@ -84,47 +85,38 @@ EOS
 end
           if opts[:init] ==true
                
-            stdin, stdout, stderr = Open3.popen3("git branch --track review origin/review")
-  	
-  	    check_remote_branch = stdout.read()
-  	    error = stderr.read().strip
-            
-	    error1= "fatal: A branch named 'review' already exists."
-            error2= "fatal: Not a valid object name: 'origin/review'."
+               stdin, stdout, stderr = Open3.popen3("git branch --track review origin/review")
+   	       check_remote_branch = stdout.read()
+  	       error = stderr.read().strip
+      	       error1= "fatal: A branch named 'review' already exists."
+               error2= "fatal: Not a valid object name: 'origin/review'."
                     
-
-
-            if error == error1.strip || error ==error2.strip 
+               if error == error1.strip || error ==error2.strip 
                end
-            puts "git-review ready to use"
+               puts "git-review ready to use"
                exit
-          elsif opts[:push] ==true  
-
-                `git push origin review:review`
-                 exit
-          elsif opts[:pull] ==true
+          
+         elsif opts[:push] ==true  
+              
+               `git push origin review:review`
+                 
+               exit
+   
+         elsif opts[:pull] ==true
              
-
- 
-                 `git clone -b review .git .git/review-workingdir`
-                  #this to create the special workingdir
-                  
-                 `git remote add rwd .git/review-workingdir`
-                   #that to create a remote pointing to it
-
-                  `git fetch origin review:origin/review`
-
-                  `git push -f rwd origin/review:origin/review`
-                   #to push the origin/review branch to that repository
-                   
-                   Dir.chdir('.git/review-workingdir/')
-                   `git merge origin/review`
-                   Dir.chdir('../../')
-                   `git fetch rwd`
-                   `git branch -f review rwd/review` 
-                   `git remote rm rwd`
-                   `rm -rf .git/review-workingdir`
-                      exit
+              `git clone -b review .git .git/review-workingdir`        #this to create the special workingdir                 
+              `git remote add rwd .git/review-workingdir`              #that to create a remote pointing to it
+              `git fetch origin review:origin/review`
+              `git push -f rwd origin/review:origin/review`            #to push the origin/review branch to that repository                   
+              Dir.chdir('.git/review-workingdir/')
+              `git merge origin/review`
+              Dir.chdir('../../')
+              `git fetch rwd`
+              `git branch -f review rwd/review` 
+              `git remote rm rwd`
+              `rm -rf .git/review-workingdir`
+                     
+                exit
               
           elsif opts[:amend] ==true               
 		
@@ -150,25 +142,28 @@ end
                 
                
 		 if ARGV.length ==0
-		review_log=`git review-log`
-                IO.popen("less", "w") { |f| f.puts review_log}
-                
-                exit
-                end 
+		    review_log=`git review-log`
+                    #IO.popen("less", "w") { |f| f.puts review_log}
+                    f = Tempfile.new('less')
+                    f.write(review_log)
+                    system("less #{f.path}")
+                    exit
+
+                 end 
                
                 commit_hash = ARGV[0]
                 commit_hash = `git rev-parse #{commit_hash}`
                 commit_hash = commit_hash.strip
-                format = `git review-log #{commit_hash}`
-                 IO.popen("less", "w") { |f| f.puts format}
-                exit 
+                review_log = `git review-log #{commit_hash}`
+                IO.popen("less", "w") { |f| f.puts review_log}
+                exit
                
           elsif opts[:format]==true
                 
            
                 if ARGV.length ==0
-                 puts " --format needs a review hash. Check git review --help"
-                 exit
+                   puts " --format needs a review hash. Check git review --help"
+                   exit
                 end
                
                 review_format = ARGV[0] 
@@ -183,9 +178,12 @@ end
                 
 		
                  if ARGV.length ==0
-		review_log_show =`git review-log-show`
-                IO.popen("less", "w") { |f| f.puts review_log_show}
-                exit
+		    review_log_show =`git review-log-show`
+                    #IO.popen("less", "w") { |f| f.puts review_log_show}
+                    f = Tempfile.new('less')
+                    f.write(review_log_show)
+                    system("less #{f.path}")
+                    exit
                 end 
                
                 commit_hash = ARGV[0]
@@ -199,8 +197,8 @@ end
                
 
                 if ARGV.length ==0
-                 puts " --display needs a review hash. Check git review --help"
-                 exit
+                   puts " --display needs a review hash. Check git review --help"
+                   exit
                 end
                
                 review_display = ARGV[0] 
@@ -210,12 +208,12 @@ end
                 print review_display
                 exit 
 
-              elsif opts[:rm]==true
+            elsif opts[:rm]==true
                
 
                 if ARGV.length ==0
-                 puts " --display needs a review hash. Check git review --help"
-                 exit
+                   puts " --display needs a review hash. Check git review --help"
+                   exit
                 end
                
                 review_del = ARGV[0] 
@@ -224,35 +222,31 @@ end
 		get_tree = `git review --show-raw #{review_del}`
                 tree_hash= get_tree.lines.first
                 tree_hash= tree_hash.split[2] 
-                
-                tree_contents_rm= `git ls-tree review:#{tree_hash}`
-                
-                              
-              checkreviewcontents= tree_contents_rm.split("\n").map {|row| row.split()}
-  	      matched_rowindex=checkreviewcontents.find_index {|row| row[3]==review_del }
+                tree_contents_rm= `git ls-tree review:#{tree_hash}`            
+                checkreviewcontents= tree_contents_rm.split("\n").map {|row| row.split()}
+  	        matched_rowindex=checkreviewcontents.find_index {|row| row[3]==review_del }
     
-              if matched_rowindex == nil
-                  puts "Review not found"
-                  exit
-              end
-             checkreviewcontents.delete_at(matched_rowindex)  
-             checkreviewcontents=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line [3]}.join "\n" 
-  	
-              tree_hashT2 = create_treeT2(checkreviewcontents)    
-               tree_contentsT1 = search(tree_hash,tree_hashT2)
-              tree_hashT1 = create_treeT1(tree_contentsT1)
-              message= "Review #{review_del} has been deleted"
-              command= "git commit-tree #{tree_hashT1} -p review "
-              commit_tree(tree_hashT1,message,command)
-
-               exit
+                if matched_rowindex == nil
+                   puts "Review not found"
+                   exit
+                end
+             
+                checkreviewcontents.delete_at(matched_rowindex)  
+                checkreviewcontents=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line [3]}.join "\n" 
+                tree_hashT2 = create_treeT2(checkreviewcontents)    
+                tree_contentsT1 = search(tree_hash,tree_hashT2)
+                tree_hashT1 = create_treeT1(tree_contentsT1)
+                message= "Review #{review_del} has been deleted"
+                command= "git commit-tree #{tree_hashT1} -p review "
+                commit_tree(tree_hashT1,message,command)
+                exit
 
                    
             elsif opts[:show_raw]==true
             
                 if ARGV.length ==0
-                 puts " --show-raw needs a review hash. Check git review --help"
-                 exit
+                   puts " --show-raw needs a review hash. Check git review --help"
+                   exit
                 end
                
                 review_raw = ARGV[0]
@@ -274,8 +268,8 @@ end
             elsif opts[:respond]==true
               
 		 if ARGV.length ==0
-                 puts " --respond needs a review hash. Check git review --help"
-                 exit
+                    puts " --respond needs a review hash. Check git review --help"
+                    exit
                 end
                
                 review_respond = ARGV[0] 
@@ -302,52 +296,37 @@ end
 if ARGV.length == 1 
   commit_hash = ARGV[0]
   commit_hash = `git rev-parse #{commit_hash}`
-  
   commit_hash = commit_hash.strip
-  
   cmd = "git log -u -1 #{commit_hash} --"
   
 else
   cmd = "git diff "
   
 end
-  
-  value = `#{cmd}`
- 
+value = `#{cmd}`
   
 if value.length==0
-  puts " Review object cannot be created. Check git review --help "
-  exit
+   puts " Review object cannot be created. Check git review --help "
+   exit
 end
 
 value.gsub!(/^/, ">")           #putting in chevrons at the beginning of every line
 review_hash = make_review(value)  
-
 stdin, stdout, stderr = Open3.popen3("git ls-tree review")
-  	
-  	
-  	check_tree = stdout.read()
-  	error = stderr.read()
-	
-
+check_tree = stdout.read()
+error = stderr.read()
 
 t="100644 blob #{review_hash}\t#{review_hash}"
-
-
 
 #A - making a review for the first time
 
  if check_tree.length==0
-  
-  tree_hashT2A = create_treeT2(t)
-  createT1A = "040000 tree #{tree_hashT2A}\t#{commit_hash}\n"
-  tree_hashT1A= create_treeT1(createT1A)  
-  messageA = "This is the first review on any commit"
-  commandA = "git commit-tree #{tree_hashT1A}"
-  commit_tree(tree_hashT1A,messageA,commandA)
-
-
-  
+    tree_hashT2A = create_treeT2(t)
+    createT1A = "040000 tree #{tree_hashT2A}\t#{commit_hash}\n"
+    tree_hashT1A= create_treeT1(createT1A)  
+    messageA = "This is the first review on any commit"
+    commandA = "git commit-tree #{tree_hashT1A}"
+    commit_tree(tree_hashT1A,messageA,commandA)
 
 #B making a review on a new commit
  else
@@ -355,32 +334,25 @@ t="100644 blob #{review_hash}\t#{review_hash}"
     checkcontents = `git ls-tree review | grep #{commit_hash} `
  
     if checkcontents.length==0
-      tree_hashT2B = create_treeT2(t) 
-      check_tree= check_tree + "040000 tree #{tree_hashT2B}\t#{commit_hash}"
-      tree_hashT1B = create_treeT1(check_tree)
-      messageB = "This is the first review on this commit"
-      commandB = "git commit-tree #{tree_hashT1B} -p review"
-      commit_tree(tree_hashT1B,messageB,commandB)
-  
-     
-
-  
-#C making a multiple review on same commit
-  else
-     
-     tree_contents= `git ls-tree review:#{commit_hash}` 
-     tree_contents = tree_contents + "100644 blob #{review_hash}\t#{review_hash}"
-     tree_hashT2C = create_treeT2(tree_contents)    
-     tree_contentsT1C = search(commit_hash,tree_hashT2C)
-     tree_hashT1C = create_treeT1(tree_contentsT1C)
-     messageC= "This commit has been reviewed before"
-     commandC= "git commit-tree #{tree_hashT1C} -p review "
-     commit_tree(tree_hashT1C,messageC,commandC)
-
+       tree_hashT2B = create_treeT2(t) 
+       check_tree= check_tree + "040000 tree #{tree_hashT2B}\t#{commit_hash}"
+       tree_hashT1B = create_treeT1(check_tree)
+       messageB = "This is the first review on this commit"
+       commandB = "git commit-tree #{tree_hashT1B} -p review"
+       commit_tree(tree_hashT1B,messageB,commandB)
  
-  
+#C making a multiple review on same commit
+ else
+     
+    tree_contents= `git ls-tree review:#{commit_hash}` 
+    tree_contents = tree_contents + "100644 blob #{review_hash}\t#{review_hash}"
+    tree_hashT2C = create_treeT2(tree_contents)    
+    tree_contentsT1C = search(commit_hash,tree_hashT2C)
+    tree_hashT1C = create_treeT1(tree_contentsT1C)
+    messageC= "This commit has been reviewed before"
+    commandC= "git commit-tree #{tree_hashT1C} -p review "
+    commit_tree(tree_hashT1C,messageC,commandC)
       
-
 end   
 end 
 

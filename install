@@ -1,11 +1,6 @@
 #!/bin/bash
 
 
-cp scripts/git-comment /usr/local/bin/git-comment
-chown root:root /usr/local/bin/git-comment
-
-
-
 cp scripts/git-review /usr/local/bin/git-review
 chown root:root /usr/local/bin/git-review
 
