@@ -9,12 +9,12 @@ root = TkRoot.new { title "git-review" }
 
 text = TkText.new(root) do
 
-    width = TkWinfo.screenwidth root
+    width = TkWinfo.screenwidth root 
     height = TkWinfo.screenheight root
-    borderwidth 4
+    borderwidth 1
     foreground 'dark green'
-    font TkFont.new('tahoma 12')
-    pack("side" => "left",  "padx"=> "5", "pady"=> "5")
+    font TkFont.new('tahoma 10')
+    pack("side" => "left",  "padx"=> "3", "pady"=> "3")
 end
  
 
@@ -27,10 +27,10 @@ text1 = TkText.new(root) do
 
    width = TkWinfo.screenwidth root
    height = TkWinfo.screenheight root
-   borderwidth 4
+   borderwidth 1
    foreground 'red'
-   font TkFont.new('tahoma 12')
-   pack("side" => "right",  "padx"=> "5", "pady"=> "5")
+   font TkFont.new('tahoma 10')
+   pack("side" => "right",  "padx"=> "3", "pady"=> "3")
 
 end
 
