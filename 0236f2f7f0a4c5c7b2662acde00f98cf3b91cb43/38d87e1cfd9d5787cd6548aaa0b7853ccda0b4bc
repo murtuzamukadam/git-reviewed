@@ -14,7 +14,7 @@
 >+>Author: Yujuan Jiang <software.jessie@gmail.com>
 >+>Date:   Fri Jun 28 12:42:53 2013 -0400
 >+>
->+>    Revert "Revert "Revert "Revert "Revert "git review --amend bug fixes"""""
+hello:w>    Revert "Revert "Revert "Revert "Revert "git review --amend bug fixes"""""
 >+>    
 >+>    This reverts commit 52c735337a8fac19fa5faf2b419ef2778e5ccbdd.
 >+>
