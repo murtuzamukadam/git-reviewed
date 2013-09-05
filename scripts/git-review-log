@@ -78,7 +78,7 @@ foreach my $rev (`git rev-list review --pretty=oneline`) {
 if ($log eq "")
  {
    
-   print "fatal: bad revision $commithash\n";
+   #print "fatal: bad revision $commithash\n";
    exit;
  }
 

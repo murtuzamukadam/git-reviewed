@@ -17,29 +17,34 @@ foreach my $rev (`git rev-list review --pretty=oneline`) {
        $sha1=$sha;
        $sha1 =~ s/^\s+//;
        $sha1 =~ s/\s+$//;
-       my $log = `git log -1 $sha`;
+       my $log = `git log -1 $sha1`;
        #print "$log\n";
        $removecheck = (split('Author: ', $log))[1];
        $removecheck = (split('\n', $removecheck))[0];
        $name = (split('\s', $removecheck))[0];
        $lastname = (split('\s', $removecheck))[1];
-       print "$name\n";
-       print "$lastname\n";
+       #print "$name\n";
+       #print "$lastname\n";
        if ($name eq $author) {
-    print "$removecheck contains $author\n";
+    #print "$removecheck contains $author\n";
+    $flag=1;
 } 
 
 elsif ($lastname eq $author) {
-    print "$removecheck contains $author\n";
+    #print "$removecheck contains $author\n";
+    $flag=1;
 } 
 
 else {
-
-     print "Please specify first name or last name of author\n";
+          $flag=0;
+     #print "Please specify first name or last name of author\n";
  }
-       }
-      #foreach my $blob (`git log --numstat -1 $sha`) {
-=for comment
+       
+
+
+
+      foreach my $blob (`git log --numstat -1 $sha`) {
+
             my @values = (split('\t', $blob))[2];
 
             foreach my $val1 (@values) {
@@ -49,7 +54,8 @@ else {
 
 		foreach my $val (@values1) {
       
-                   if($flag == 1 && $val ne $commithash) {
+                   
+                   if($flag != 1) {
             
                       next OUTER;
                    }
@@ -98,10 +104,4 @@ else {
        
 }
 
-if ($log eq "")
- {
-   
-   print "fatal: bad revision $commithash\n";
-   exit;
- }
-=cut
+
