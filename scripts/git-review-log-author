@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+
+my $author = $ARGV[0];
+my $flag = 0; 
+my $log = '';
+
+#if(length($commithash) != 0)
+ #{
+  # $flag =1;
+ #} 
+
+
+OUTER:
+foreach my $rev (`git rev-list review --pretty=oneline`) {
+   
+      ($sha=$rev) =~ s/\s.*$//;
+       $sha1=$sha;
+       $sha1 =~ s/^\s+//;
+       $sha1 =~ s/\s+$//;
+       my $log = `git log -1 $sha`;
+       #print "$log\n";
+       $removecheck = (split('Author: ', $log))[1];
+       $removecheck = (split('\n', $removecheck))[0];
+       $name = (split('\s', $removecheck))[0];
+       $lastname = (split('\s', $removecheck))[1];
+       print "$name\n";
+       print "$lastname\n";
+       if ($name eq $author) {
+    print "$removecheck contains $author\n";
+} 
+
+elsif ($lastname eq $author) {
+    print "$removecheck contains $author\n";
+} 
+
+else {
+
+     print "Please specify first name or last name of author\n";
+ }
+       }
+      #foreach my $blob (`git log --numstat -1 $sha`) {
+=for comment
+            my @values = (split('\t', $blob))[2];
+
+            foreach my $val1 (@values) {
+
+                my @values1 = (split('\/', $val1))[0];
+                $val1 = (split('\/', $blob))[1];
+
+		foreach my $val (@values1) {
+      
+                   if($flag == 1 && $val ne $commithash) {
+            
+                      next OUTER;
+                   }
+                  $log = $log."\nReview ";
+                  print "\nReview ";
+        	  $log = $log."$val1";  
+       		  print $val1;
+	          $log = $log."commit Reviewed  "; 
+                  print "commit Reviewed ";
+                  $log = $log."$val\n"; 
+                  print "$val\n";
+               }
+
+
+            }
+      }
+
+   $sha =~ s/^\s+//;
+   $sha =~ s/\s+$//;
+   my $log = `git log -1 $sha`;  
+   my $log_amend = (split('Amended Review', $log))[1];
+   my $log_response = (split('Response to', $log))[1];
+   my $removemessage = (split('\n\n', $log))[0]; 
+   $log = $log."$removemessage\n";
+   $removecheck = (split('Merge:', $removemessage))[1];
+   if(length($removecheck) == 0)
+   {  
+      print "$removemessage\n"; 
+   }
+   
+   if($log_amend)
+   {
+     $log = $log."Amended Review";
+     print "Amended Review"; 
+     $log = $log."$log_amend";      
+     print "$log_amend";
+   }
+   
+   if($log_response)
+    {
+      $log = $log."Response to";
+      print "Response to";
+      $log = $log."$log_response"; 
+      print "$log_response";
+    }
+       
+}
+
+if ($log eq "")
+ {
+   
+   print "fatal: bad revision $commithash\n";
+   exit;
+ }
+=cut

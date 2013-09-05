@@ -73,14 +73,15 @@ opts = Trollop::options do
 EOS
   opt :init, "Initialize the repository to start reviewing" 
   opt :amend, "Change the last review committed"
-  opt :log, "Display log history for all reviews done" 
+  opt :log, "Display log history for all reviews done"
+  opt :log_author, "Displays log history of all reviews made by a particular author" 
   opt :respond, "Respond to a review"
   opt :show_raw, "Display raw review contents"
   opt :log_show, "Displays the log history for all reviews along with the raw content"
   opt :format, "Prepare reviews for email submissions"
   opt :push, "Updates remote repositories by adding reviews"
   opt :pull, "Fetches reviews from remote repositories" 
-  opt :display, "Displays the review properly"
+  opt :display, "Displays the review along with interleaved history"
   opt :rm, "Deletes the review"
 end
           if opts[:init] ==true
@@ -157,7 +158,26 @@ end
                 review_log = `git review-log #{commit_hash}`
                 IO.popen("less", "w") { |f| f.puts review_log}
                 exit
+            
+            elsif opts[:log_author]==true
+                
+                 if ARGV.length ==0
+                   puts " --log-author needs an author name. Check git review --help"
+                   exit               
+		 
+                 end 
                
+                author_name = ARGV[0]
+                #author_name = `git rev-parse #{author_name}`
+                author_name = author_name.strip
+                author_name = author_name.capitalize
+                puts author_name
+                review_log_author = `git review-log-author #{author_name}`
+                IO.popen("less", "w") { |f| f.puts review_log_author}
+                exit         
+
+
+   
           elsif opts[:format]==true
                 
            

@@ -16,6 +16,9 @@ chown root:root /usr/local/bin/git-review-log
 cp scripts/git-review-log-show /usr/local/bin/git-review-log-show
 chown root:root /usr/local/bin/git-review-log-show
 
+cp scripts/git-review-log-author /usr/local/bin/git-review-log-author
+chown root:root /usr/local/bin/git-review-log-author
+
 cp scripts/git-reviewmbox /usr/local/bin/git-reviewmbox
 chown root:root /usr/local/bin/git-reviewmbox
 
