@@ -40,7 +40,7 @@ Updates remote repositories by adding reviews.
 Shows the log history of the reviews made along with the reviewer details.
 .
 .P
-\fB--log\fR=\fIcommit-hash\fR
+\fB--log\fR \fIcommit-hash\fR
 .
 .P
 Shows the log history of the reviews made along with the reviewer details for a particular commit.
@@ -52,10 +52,40 @@ Shows the log history of the reviews made along with the reviewer details for a 
 Shows the log history of the reviews made along with raw review content.
 .
 .P
-\fB--log-show\fR=\fIcommit-hash\fR
+\fB--log-show\fR \fIcommit-hash\fR
 .
 .P
 Shows the log history of the reviews made along with raw review content for a particular commit.
+.
+.P
+\fB--log-author\fR \fIauthor-name\fR
+.
+.P
+Shows the log history of the reviews made by the author.
+.
+.P
+\fB--list\fR
+.
+.P
+Lists all the reviews present on the review branch.
+.
+.P
+\fB--list\fR \fIcommit-hash\fR
+.
+.P
+Lists all the reviews present on the review branch for the given commit.
+.
+.P
+\fB--list-author\fR \fIauthor-name\fR
+.
+.P
+Lists all the reviews made by the given author.
+.
+.P
+\fB--filter-author\fR \fIauthor-name\fR
+.
+.P
+Deletes all the reviews on the review branch except the reviews made by the author.
 .
 .P
 \fB--amend\fR
@@ -64,31 +94,31 @@ Shows the log history of the reviews made along with raw review content for a pa
 Allows reviewer to make any change to the last review.
 .
 .P
-\fB--show-raw\fR=\fIreview-hash\fR
+\fB--show-raw\fR \fIreview-hash\fR
 .
 .P
 Shows the contents of the review object.
 .
 .P
-\fB--format\fR=\fIreview-hash\fR
+\fB--format\fR \fIreview-hash\fR
 .
 .P
 Prepares the review for an email submission.
 .
 .P
-\fB--respond\fR=\fIreview-hash\fR
+\fB--respond\fR \fIreview-hash\fR
 .
 .P
 Allows reviewer to respond to any review.
 .
 .P
-\fB--display\fR=\fIreview-hash\fR
+\fB--display\fR \fIreview-hash\fR
 .
 .P
 Displays the interleaved history in a window.
 .
 .P
-\fB--rm\fR=\fIreview-hash\fR
+\fB--rm\fR \fIreview-hash\fR
 .
 .P
 Deletes the review.
@@ -225,6 +255,27 @@ Date:   Fri Jun 21 23:50:50 2013 -0400
 .br
 1.8.1.msysgit.
 .
+.P
+$ git review --list 
+.P
+... lists all the reviews present on the review branch.
+.br
+Review: 188aa11a5c2dbeaec05491a73f94ba931248db65
+.br
+Commit Reviewed: add7ad68fe46a9a71bbcfb348f75dfa85f758163
+.br
+Reviewer: Tavish Armstrong <tavisharmstrong@gmail.com>
+.br
+Date:   Thu Aug 22 12:24:00 2013 -0400
+.P
+Review: 2f538aa6cdf4d53ffb7846dbcfd5020ce7aad8bf
+.br
+Commit Reviewed: add7ad68fe46a9a71bbcfb348f75dfa85f758163
+.br
+Reviewer: Murtuza Mukadam <murtuza16289@gmail.com>
+.br
+Date:   Thu Aug 22 12:17:33 2013 -0400
+.br
 .P
 .SH "AUTHOR"
 .br

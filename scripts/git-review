@@ -147,8 +147,11 @@ end
                
 		 if ARGV.length ==0
 		    review_log=`git review-log` 
+                    begin
                     IO.popen("less", "w") { |f| f.puts review_log}                  
-                  
+                    rescue Errno::EPIPE
+                     #do nothing
+                    end
                     exit
 
                  end 
@@ -172,8 +175,11 @@ end
                     puts "No reviews found for commit #{commit_hash}"
                     exit
                 end
-                
+                begin
                 IO.popen("less", "w") { |f| f.puts review_log_commit}
+                rescue Errno::EPIPE
+                     #do nothing
+                    end
                 exit
             
             elsif opts[:log_author]==true
@@ -193,8 +199,11 @@ end
                     puts "No reviews found for author #{author_name}"
                 exit
                 end
+                begin
                 IO.popen("less", "w") { |f| f.puts review_log_author}                  
-                  
+                rescue Errno::EPIPE
+                     #do nothing
+                    end 
                 exit         
 
 
@@ -226,8 +235,13 @@ end
 		
                  if ARGV.length ==0
 		    review_log_show =`git review-log-show`
-                    IO.popen("less", "w") { |f| f.puts review_log_show}                  
-                  
+                    begin
+                    IO.popen("less", "w") { |f| f.puts review_log_show}   
+                    rescue Errno::EPIPE
+                     #do nothing
+                    end
+                                
+                     
                     exit
                 end 
                
@@ -249,8 +263,11 @@ end
                     puts "No reviews found for commit #{commit_hash}"
                 exit
                 end
+                begin
                 IO.popen("less", "w") { |f| f.puts review_log_show}                  
-                  
+                rescue Errno::EPIPE
+                     #do nothing
+                    end 
                 exit 
            
             elsif opts[:display]==true
@@ -329,48 +346,48 @@ end
                 if review_log_author.length == 0 
                    
                     puts "No reviews found for author #{filter_author}"
-                exit
+                    exit
                 end
                 filter_list = ''
                 list_reviews = '' 
                 review_log_author = review_log_author.split(/\n/)
-               
                 review_log_author.each do |n|
                 
-                n=~ /Review\s(.*)/m
-                p=$1
+                      n=~ /Review\s(.*)/m
+                      p=$1
                 
-                if p != nil
-                filter_list = filter_list + "#{p}\n"
-                end
+                     if p != nil
+                        filter_list = filter_list + "#{p}\n"
+                     end
                 end
                
                 list = `git review --list`
                 list = list.split(/\n/)
-               
-                
+                              
                 list.each do |n|
                 
-                n=~ /Review:\s(.*)/m
-                p_list=$1
-                if p_list != nil
-                list_reviews = list_reviews + "#{p_list}\n"
-                end
+                     n=~ /Review:\s(.*)/m
+                     p_list=$1
+                
+
+                     if p_list != nil
+                        list_reviews = list_reviews + "#{p_list}\n"
+                     end
                 end
                 
                 list_reviews = list_reviews.split(/\n/)
                 filter_list = filter_list.split(/\n/)
                 def remove(ar_1, ar_2)
-                x=(ar_1 + ar_2) - (ar_1 & ar_2)
+                    x=(ar_1 + ar_2) - (ar_1 & ar_2)
                 
-                   end
+                end
                 x=remove(list_reviews,filter_list)
                 x.each do |num|
                 
-                reviewdel =  `git review --rm #{num}`
-                puts reviewdel
+                      reviewdel =  `git review --rm #{num}`
+                      puts reviewdel
                   
-                 end
+                end
                 exit
            
 
@@ -382,21 +399,27 @@ end
                    l = check_list.length
                    list=""
                    check_list.each do |commitid|
-                   commitid=commitid.split(/\t/)
-                   check_list_commit = `git ls-tree review:#{commitid[1]}`
-                   check_list_commit =  check_list_commit.split(/\n/)
-                   l = check_list_commit.length
-                   check_list_commit.each do |n|
-                   n=n.split(/\t/)
-                   list= list + "\nReview: #{n[1]}\n"
-                   list_review = `git review --show-raw #{n[1]}`
-                   list_review = list_review.split(/\n\n/)[0]
-                   list = list + "#{list_review}\n"
+                        commitid=commitid.split(/\t/)
+                        check_list_commit = `git ls-tree review:#{commitid[1]}`
+                        check_list_commit =  check_list_commit.split(/\n/)
+                        l = check_list_commit.length
+                        check_list_commit.each do |n|
+                              n=n.split(/\t/)
+                              list= list + "\nReview: #{n[1]}\n"
+                              list_review = `git review --show-raw #{n[1]}`
+                              list_review = list_review.split(/\n\n/)[0]
+                              list = list + "#{list_review}\n"
+                        end
                    end
-                   end
+                   begin
                    IO.popen("less", "w") { |f| f.puts list}
+                   rescue Errno::EPIPE
+                     #do nothing
+                    end
                    exit
                 end
+                
+
                 commit_hash = ARGV[0]
                 check= `git cat-file -t #{commit_hash}`
                 check=check.strip
@@ -414,19 +437,23 @@ end
                 l = check_list.length
                 list="Total Number of Reviews: #{l}\n"
                 check_list.each do |n|
-                n=n.split(/\t/)
-                list= list + "\nReview: #{n[1]}\n"
-                list_review = `git review --show-raw #{n[1]}`
-                list_review = list_review.split(/\n\n/)[0]
-                list = list + "#{list_review}\n"
+                      n=n.split(/\t/)
+                      list= list + "\nReview: #{n[1]}\n"
+                      list_review = `git review --show-raw #{n[1]}`
+                      list_review = list_review.split(/\n\n/)[0]
+                      list = list + "#{list_review}\n"
                 end 
-                 if list.length == 0 
+                
+                if list.length == 0 
                    
                     puts "No reviews found for commit #{commit_hash}"
-                exit
+                    exit
                 end
-                
-                IO.popen("less", "w") { |f| f.puts list}              
+                begin
+                IO.popen("less", "w") { |f| f.puts list}
+                rescue Errno::EPIPE
+                     #do nothing
+                    end              
                 exit
 
 
@@ -442,45 +469,41 @@ end
                 author_name = ARGV[0]
                 author_name = author_name.strip
                 author_name = author_name.capitalize
-
-                   check_list = `git ls-tree review`
-                   check_list =  check_list.split(/\n/)
-                   l = check_list.length
-                   list=""
-                   check_list.each do |commitid|
-                   commitid=commitid.split(/\t/)
-                   check_list_commit = `git ls-tree review:#{commitid[1]}`
-                   check_list_commit =  check_list_commit.split(/\n/)
-                   l = check_list_commit.length
-                   check_list_commit.each do |n|
-                   n=n.split(/\t/)
-                   
-                   list_review = `git review --show-raw #{n[1]}`
-                   list_review=~ /Reviewer:\s(.*)/m
-                   author=$1
-                   author=author.split(/\n/)[0]
-                   name = author.split(/\s/)[0]
-                   last_name = author.split(/\s/)[1]
-                   #puts name + "---" + last_name
-                   
-                   
-                   if author_name==last_name || author_name==name 
-                   list= list + "\nReview #{n[1]}\n"
-                   
-                   list_review = list_review.split(/\n\n/)[0]
-                   list = list + "#{list_review}\n"
-                   end
-                   end
-                   end
-                   if list.length == 0 
+		check_list = `git ls-tree review`
+                check_list =  check_list.split(/\n/)
+                l = check_list.length
+                list=""
+                check_list.each do |commitid|
+                     commitid=commitid.split(/\t/)
+                     check_list_commit = `git ls-tree review:#{commitid[1]}`
+                     check_list_commit =  check_list_commit.split(/\n/)
+                     l = check_list_commit.length
+                     check_list_commit.each do |n|
+                           n=n.split(/\t/)
+                           list_review = `git review --show-raw #{n[1]}`
+                           list_review=~ /Reviewer:\s(.*)/m
+                           author=$1
+                           author=author.split(/\n/)[0]
+                           name = author.split(/\s/)[0]
+                           last_name = author.split(/\s/)[1]               
+                           if author_name==last_name || author_name==name 
+                               list= list + "\nReview #{n[1]}\n"
+                               list_review = list_review.split(/\n\n/)[0]
+                               list = list + "#{list_review}\n"
+                           end
+                    end
+               end
+                if list.length == 0 
                    
                     puts "No reviews found for author #{author_name}"
-                exit
+                    exit
                 end
-                
-               
-                   IO.popen("less", "w") { |f| f.puts list}
-                   exit
+                begin
+                IO.popen("less", "w") { |f| f.puts list}
+                rescue Errno::EPIPE
+                     #do nothing
+                    end
+                exit
                 
 
              elsif opts[:show_raw]==true
@@ -511,7 +534,11 @@ end
                 raw=raw + reviewer_details[54..-1]
                 review_show_raw= %x(git cat-file -p #{review_raw})
                 raw = raw + review_show_raw
+                begin
                 IO.popen("less", "w") { |f| f.puts raw}
+                rescue Errno::EPIPE
+                     #do nothing
+                    end
                 exit
 
             elsif opts[:respond]==true

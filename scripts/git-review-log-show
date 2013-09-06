@@ -16,7 +16,7 @@ foreach my $rev (`git rev-list review --pretty=oneline`) {
         ($sha=$rev) =~ s/\s.*$//;
    
         foreach my $blob (`git log --numstat -1 $sha`) {
-        my @values = (split('\t', $blob))[2];
+           my @values = (split('\t', $blob))[2];
 
            foreach my $val1 (@values) {
                my @values1 = (split('\/', $val1))[0];
@@ -46,7 +46,11 @@ foreach my $rev (`git rev-list review --pretty=oneline`) {
   
        my $log = `git log -1 $sha`;
        my $removemessage = (split('\n\n', $log))[0];
-       print "$removemessage\n";
+       $removecheck = (split('Merge:', $removemessage))[1];
+       if(length($removecheck) == 0)
+          {  
+              print "$removemessage\n"; 
+          }
    
 }
 
