@@ -83,6 +83,9 @@ EOS
   opt :pull, "Fetches reviews from remote repositories" 
   opt :display, "Displays the review along with interleaved history"
   opt :rm, "Deletes the review"
+  opt :list, "View list of reviews for a particular commit"
+  opt :list_author, "View list of reviews made by a particular author"
+  opt :filter_author, "Deletes all reviews except the author specified"
 end
           if opts[:init] ==true
                
@@ -143,10 +146,9 @@ end
                 
                
 		 if ARGV.length ==0
-		    review_log=`git review-log`                   
-                    f = Tempfile.new('less')
-                    f.write(review_log)
-                    system("less #{f.path}")
+		    review_log=`git review-log` 
+                    IO.popen("less", "w") { |f| f.puts review_log}                  
+                  
                     exit
 
                  end 
@@ -191,9 +193,8 @@ end
                     puts "No reviews found for author #{author_name}"
                 exit
                 end
-                f = Tempfile.new('less')
-                    f.write(review_log_author)
-                    system("less #{f.path}")
+                IO.popen("less", "w") { |f| f.puts review_log_author}                  
+                  
                 exit         
 
 
@@ -207,6 +208,12 @@ end
                 end
                
                 review_format = ARGV[0] 
+                check= `git cat-file -t #{review_format}`
+                check=check.strip
+                if check != "blob"
+                   puts "--format needs a review hash. Check git review --help"
+                   exit
+                end
                 review_format = `git rev-parse #{review_format}`
                 review_format = review_format.strip
 		format =`git review-format #{review_format}`
@@ -219,9 +226,8 @@ end
 		
                  if ARGV.length ==0
 		    review_log_show =`git review-log-show`
-                    f = Tempfile.new('less')
-                    f.write(review_log_show)
-                    system("less #{f.path}")
+                    IO.popen("less", "w") { |f| f.puts review_log_show}                  
+                  
                     exit
                 end 
                
@@ -243,9 +249,8 @@ end
                     puts "No reviews found for commit #{commit_hash}"
                 exit
                 end
-                f = Tempfile.new('less')
-                f.write(review_log_show)
-                system("less #{f.path}")
+                IO.popen("less", "w") { |f| f.puts review_log_show}                  
+                  
                 exit 
            
             elsif opts[:display]==true
@@ -257,6 +262,12 @@ end
                 end
                
                 review_display = ARGV[0] 
+                check= `git cat-file -t #{review_display}`
+                check=check.strip
+                if check != "blob"
+                   puts "--display needs a review hash. Check git review --help"
+                   exit
+                end
                 review_display = `git rev-parse #{review_display}`
                 review_display = review_display.strip
 		review_display =`git display #{review_display}`
@@ -271,7 +282,13 @@ end
                    exit
                 end
                
-                review_del = ARGV[0] 
+                review_del = ARGV[0]
+                check= `git cat-file -t #{review_del}`
+                check=check.strip
+                if check != "blob"
+                   puts "--rm needs a review hash. Check git review --help"
+                   exit
+                end 
                 review_del = `git rev-parse #{review_del}`
                 review_del = review_del.strip
 		get_tree = `git review --show-raw #{review_del}`
@@ -294,10 +311,179 @@ end
                 message= "Review #{review_del} has been deleted"
                 command= "git commit-tree #{tree_hashT1} -p review "
                 commit_tree(tree_hashT1,message,command)
+                puts "Review #{review_del} deleted successfully"
                 exit
 
                    
-            elsif opts[:show_raw]==true
+              elsif opts[:filter_author]==true
+            
+                if ARGV.length ==0
+                   puts " Specify an author/reviewer you want to filter, thereby deleting all other reviews. Check git review --help"
+                   exit
+                end
+               
+                filter_author = ARGV[0]
+                filter_author = filter_author.strip
+                filter_author = filter_author.capitalize
+                review_log_author = `git review --list-author #{filter_author}`
+                if review_log_author.length == 0 
+                   
+                    puts "No reviews found for author #{filter_author}"
+                exit
+                end
+                filter_list = ''
+                list_reviews = '' 
+                review_log_author = review_log_author.split(/\n/)
+               
+                review_log_author.each do |n|
+                
+                n=~ /Review\s(.*)/m
+                p=$1
+                
+                if p != nil
+                filter_list = filter_list + "#{p}\n"
+                end
+                end
+               
+                list = `git review --list`
+                list = list.split(/\n/)
+               
+                
+                list.each do |n|
+                
+                n=~ /Review:\s(.*)/m
+                p_list=$1
+                if p_list != nil
+                list_reviews = list_reviews + "#{p_list}\n"
+                end
+                end
+                
+                list_reviews = list_reviews.split(/\n/)
+                filter_list = filter_list.split(/\n/)
+                def remove(ar_1, ar_2)
+                x=(ar_1 + ar_2) - (ar_1 & ar_2)
+                
+                   end
+                x=remove(list_reviews,filter_list)
+                x.each do |num|
+                
+                reviewdel =  `git review --rm #{num}`
+                puts reviewdel
+                  
+                 end
+                exit
+           
+
+             elsif opts[:list]==true
+             
+                if ARGV.length ==0
+                   check_list = `git ls-tree review`
+                   check_list =  check_list.split(/\n/)
+                   l = check_list.length
+                   list=""
+                   check_list.each do |commitid|
+                   commitid=commitid.split(/\t/)
+                   check_list_commit = `git ls-tree review:#{commitid[1]}`
+                   check_list_commit =  check_list_commit.split(/\n/)
+                   l = check_list_commit.length
+                   check_list_commit.each do |n|
+                   n=n.split(/\t/)
+                   list= list + "\nReview: #{n[1]}\n"
+                   list_review = `git review --show-raw #{n[1]}`
+                   list_review = list_review.split(/\n\n/)[0]
+                   list = list + "#{list_review}\n"
+                   end
+                   end
+                   IO.popen("less", "w") { |f| f.puts list}
+                   exit
+                end
+                commit_hash = ARGV[0]
+                check= `git cat-file -t #{commit_hash}`
+                check=check.strip
+                if check != "commit"
+                   puts "--log needs a commit hash. Check git review --help"
+                   exit
+                end
+                
+                stdin, stdout, stderr = Open3.popen3("git rev-parse #{commit_hash}")
+                commit_hash = stdout.read()
+                error = stderr.read()
+                commit_hash = commit_hash.strip
+                check_list = `git ls-tree review:#{commit_hash}`
+                check_list =  check_list.split(/\n/)
+                l = check_list.length
+                list="Total Number of Reviews: #{l}\n"
+                check_list.each do |n|
+                n=n.split(/\t/)
+                list= list + "\nReview: #{n[1]}\n"
+                list_review = `git review --show-raw #{n[1]}`
+                list_review = list_review.split(/\n\n/)[0]
+                list = list + "#{list_review}\n"
+                end 
+                 if list.length == 0 
+                   
+                    puts "No reviews found for commit #{commit_hash}"
+                exit
+                end
+                
+                IO.popen("less", "w") { |f| f.puts list}              
+                exit
+
+
+             elsif opts[:list_author]==true
+             
+                if ARGV.length ==0
+
+                   puts " --log-author needs an author name. Check git review --help"
+                   exit               
+		 
+                 end 
+               
+                author_name = ARGV[0]
+                author_name = author_name.strip
+                author_name = author_name.capitalize
+
+                   check_list = `git ls-tree review`
+                   check_list =  check_list.split(/\n/)
+                   l = check_list.length
+                   list=""
+                   check_list.each do |commitid|
+                   commitid=commitid.split(/\t/)
+                   check_list_commit = `git ls-tree review:#{commitid[1]}`
+                   check_list_commit =  check_list_commit.split(/\n/)
+                   l = check_list_commit.length
+                   check_list_commit.each do |n|
+                   n=n.split(/\t/)
+                   
+                   list_review = `git review --show-raw #{n[1]}`
+                   list_review=~ /Reviewer:\s(.*)/m
+                   author=$1
+                   author=author.split(/\n/)[0]
+                   name = author.split(/\s/)[0]
+                   last_name = author.split(/\s/)[1]
+                   #puts name + "---" + last_name
+                   
+                   
+                   if author_name==last_name || author_name==name 
+                   list= list + "\nReview #{n[1]}\n"
+                   
+                   list_review = list_review.split(/\n\n/)[0]
+                   list = list + "#{list_review}\n"
+                   end
+                   end
+                   end
+                   if list.length == 0 
+                   
+                    puts "No reviews found for author #{author_name}"
+                exit
+                end
+                
+               
+                   IO.popen("less", "w") { |f| f.puts list}
+                   exit
+                
+
+             elsif opts[:show_raw]==true
             
                 if ARGV.length ==0
                    puts " --show-raw needs a review hash. Check git review --help"
@@ -305,6 +491,12 @@ end
                 end
                
                 review_raw = ARGV[0]
+                check= `git cat-file -t #{review_raw}`
+                check=check.strip
+                if check != "blob"
+                   puts "--show-raw needs a review hash. Check git review --help"
+                   exit
+                end
                 review_raw = `git rev-parse #{review_raw}`
                 review_raw = review_raw.strip
                 checkcontents = `git review --log`
@@ -312,8 +504,10 @@ end
                 matched_rowindex=checkcontents.index("Review #{review_raw}")
                 commithash = checkcontents[matched_rowindex+1]
                 commithash = commithash.split[2]
-                reviewer_details = `git log -1 review  -- #{commithash}/#{review_raw}` 
-                raw = "Commit Reviewed: #{commithash}\nReviewer "
+                stdin, stdout, stderr = Open3.popen3("git log -1 review  -- #{commithash}/#{review_raw}")
+                reviewer_details = stdout.read()
+                error = stderr.read()  
+                raw = "Commit Reviewed: #{commithash}\nReviewer"
                 raw=raw + reviewer_details[54..-1]
                 review_show_raw= %x(git cat-file -p #{review_raw})
                 raw = raw + review_show_raw
@@ -328,6 +522,12 @@ end
                 end
                
                 review_respond = ARGV[0] 
+                check= `git cat-file -t #{review_respond}`
+                check=check.strip
+                if check != "blob"
+                   puts "--respond needs a review hash. Check git review --help"
+                   exit
+                end
                 review_respond = `git rev-parse #{review_respond}`
                 review_respond = review_respond.strip 
                 get_tree = `git review --show-raw #{review_respond}`

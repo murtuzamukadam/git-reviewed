@@ -25,15 +25,11 @@ foreach my $rev (`git rev-list review --pretty=oneline`) {
        $lastname = (split('\s', $removecheck))[1];
        #print "$name\n";
        #print "$lastname\n";
-       if ($name eq $author) {
+       if ($name eq $author || $lastname eq $author) {
     #print "$removecheck contains $author\n";
     $flag=1;
 } 
 
-elsif ($lastname eq $author) {
-    #print "$removecheck contains $author\n";
-    $flag=1;
-} 
 
 else {
           $flag=0;

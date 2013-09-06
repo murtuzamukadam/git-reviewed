@@ -60,7 +60,7 @@ foreach my $rev (`git rev-list review --pretty=oneline`) {
    if($log_amend)
    {
      $log = $log."Amended Review";
-     print "Amended Review"; 
+     print "Amended Review:"; 
      $log = $log."$log_amend";      
      print "$log_amend";
    }
@@ -68,7 +68,7 @@ foreach my $rev (`git rev-list review --pretty=oneline`) {
    if($log_response)
     {
       $log = $log."Response to";
-      print "Response to";
+      print "Response to:";
       $log = $log."$log_response"; 
       print "$log_response";
     }
