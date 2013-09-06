@@ -143,9 +143,7 @@ end
                 
                
 		 if ARGV.length ==0
-		    review_log=`git review-log`
-                    
-                    #IO.popen("less", "w") { |f| f.puts review_log}
+		    review_log=`git review-log`                   
                     f = Tempfile.new('less')
                     f.write(review_log)
                     system("less #{f.path}")
@@ -164,20 +162,17 @@ end
                 stdin, stdout, stderr = Open3.popen3("git rev-parse #{commit_hash}")
                 commit_hash = stdout.read()
                 error = stderr.read()
-                
                 commit_hash = commit_hash.strip
-                review_log = `git review-log #{commit_hash}`
-               
-                 if review_log.length == 0 
+                review_log_commit = `git review-log #{commit_hash}`
+                
+                if review_log_commit.length == 0 
                    
                     puts "No reviews found for commit #{commit_hash}"
-                exit
+                    exit
                 end
                 
-                f = Tempfile.new('less')
-                    f.write(review_log)
-                    system("less #{f.path}")
-                    exit
+                IO.popen("less", "w") { |f| f.puts review_log_commit}
+                exit
             
             elsif opts[:log_author]==true
                 
@@ -188,10 +183,8 @@ end
                  end 
                
                 author_name = ARGV[0]
-                #author_name = `git rev-parse #{author_name}`
                 author_name = author_name.strip
                 author_name = author_name.capitalize
-                
                 review_log_author = `git review-log-author #{author_name}`
                 if review_log_author.length == 0 
                    
@@ -226,7 +219,6 @@ end
 		
                  if ARGV.length ==0
 		    review_log_show =`git review-log-show`
-                    #IO.popen("less", "w") { |f| f.puts review_log_show}
                     f = Tempfile.new('less')
                     f.write(review_log_show)
                     system("less #{f.path}")
@@ -242,14 +234,8 @@ end
                 end
                 stdin, stdout, stderr = Open3.popen3("git rev-parse #{commit_hash}")
                 commit_hash = stdout.read()
-                error = stderr.read()
-                if error.length !=0
-                 puts "fatal: bad revision #{commit_hash}\n--log-show needs a commit hash. Check git review --help"
-                exit
-                end
-               
+                error = stderr.read()              
                 commit_hash = commit_hash.strip
-               
                 review_log_show = `git review-log-show #{commit_hash}`
                  
                 if review_log_show.length == 0 
@@ -258,8 +244,8 @@ end
                 exit
                 end
                 f = Tempfile.new('less')
-                    f.write(review_log_show)
-                    system("less #{f.path}")
+                f.write(review_log_show)
+                system("less #{f.path}")
                 exit 
            
             elsif opts[:display]==true
