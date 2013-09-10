@@ -424,7 +424,7 @@ end
                 check= `git cat-file -t #{commit_hash}`
                 check=check.strip
                 if check != "commit"
-                   puts "--log needs a commit hash. Check git review --help"
+                   puts "--list needs a commit hash. Check git review --help"
                    exit
                 end
                 
