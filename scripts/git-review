@@ -84,7 +84,6 @@ EOS
   opt :display, "Displays the review along with interleaved history"
   opt :rm, "Deletes the review"
   opt :list, "View list of reviews for a particular commit"
-  opt :list_author, "View list of reviews made by a particular author"
   opt :filter_author, "Deletes all reviews except the author specified"
 end
           if opts[:init] ==true
@@ -332,65 +331,7 @@ end
                 exit
 
                    
-              elsif opts[:filter_author]==true
-            
-                if ARGV.length ==0
-                   puts " Specify an author/reviewer you want to filter, thereby deleting all other reviews. Check git review --help"
-                   exit
-                end
-               
-                filter_author = ARGV[0]
-                filter_author = filter_author.strip
-                filter_author = filter_author.capitalize
-                review_log_author = `git review --list-author #{filter_author}`
-                if review_log_author.length == 0 
-                   
-                    puts "No reviews found for author #{filter_author}"
-                    exit
-                end
-                filter_list = ''
-                list_reviews = '' 
-                review_log_author = review_log_author.split(/\n/)
-                review_log_author.each do |n|
-                
-                      n=~ /Review\s(.*)/m
-                      p=$1
-                
-                     if p != nil
-                        filter_list = filter_list + "#{p}\n"
-                     end
-                end
-               
-                list = `git review --list`
-                list = list.split(/\n/)
-                              
-                list.each do |n|
-                
-                     n=~ /Review:\s(.*)/m
-                     p_list=$1
-                
-
-                     if p_list != nil
-                        list_reviews = list_reviews + "#{p_list}\n"
-                     end
-                end
-                
-                list_reviews = list_reviews.split(/\n/)
-                filter_list = filter_list.split(/\n/)
-                def remove(ar_1, ar_2)
-                    x=(ar_1 + ar_2) - (ar_1 & ar_2)
-                
-                end
-                x=remove(list_reviews,filter_list)
-                x.each do |num|
-                
-                      reviewdel =  `git review --rm #{num}`
-                      puts reviewdel
-                  
-                end
-                exit
-           
-
+              
              elsif opts[:list]==true
              
                 if ARGV.length ==0
@@ -405,10 +346,8 @@ end
                         l = check_list_commit.length
                         check_list_commit.each do |n|
                               n=n.split(/\t/)
-                              list= list + "\nReview: #{n[1]}\n"
-                              list_review = `git review --show-raw #{n[1]}`
-                              list_review = list_review.split(/\n\n/)[0]
-                              list = list + "#{list_review}\n"
+                              list= list + "\nReview: #{n[1]}"
+                              list = list + "\nCommit Reviewed: #{commitid[1]}\n"
                         end
                    end
                    begin
@@ -439,9 +378,7 @@ end
                 check_list.each do |n|
                       n=n.split(/\t/)
                       list= list + "\nReview: #{n[1]}\n"
-                      list_review = `git review --show-raw #{n[1]}`
-                      list_review = list_review.split(/\n\n/)[0]
-                      list = list + "#{list_review}\n"
+                      
                 end 
                 
                 if list.length == 0 
@@ -457,7 +394,7 @@ end
                 exit
 
 
-             elsif opts[:list_author]==true
+             elsif opts[:filter_author]==true
              
                 if ARGV.length ==0
 
@@ -479,30 +416,21 @@ end
                      check_list_commit =  check_list_commit.split(/\n/)
                      l = check_list_commit.length
                      check_list_commit.each do |n|
-                           n=n.split(/\t/)
-                           list_review = `git review --show-raw #{n[1]}`
-                           list_review=~ /Reviewer:\s(.*)/m
-                           author=$1
+                           n=n.split(/\t/)[1]
+                           list_review = `git log --numstat review |grep -B 5 #{n}`
+                                                       
+                           list_review = list_review.split(/\n/)[0]
+                           author = list_review.split("Author: ")[1]
                            author=author.split(/\n/)[0]
                            name = author.split(/\s/)[0]
                            last_name = author.split(/\s/)[1]               
-                           if author_name==last_name || author_name==name 
-                               list= list + "\nReview #{n[1]}\n"
-                               list_review = list_review.split(/\n\n/)[0]
-                               list = list + "#{list_review}\n"
+                           if author_name!=last_name && author_name!=name 
+                              reviewdel =  `git review --rm #{n}`
+                              puts reviewdel  
                            end
                     end
                end
-                if list.length == 0 
-                   
-                    puts "No reviews found for author #{author_name}"
-                    exit
-                end
-                begin
-                IO.popen("less", "w") { |f| f.puts list}
-                rescue Errno::EPIPE
-                     #do nothing
-                    end
+               
                 exit
                 
 
@@ -579,9 +507,9 @@ if ARGV.length == 1
   commit_hash = `git rev-parse #{commit_hash}`
   commit_hash = commit_hash.strip
   cmd = "git log -u -1 #{commit_hash} --"
-  
 else
-  cmd = "git diff "
+puts "git review needs a commit hash. Check git review --help"
+exit
   
 end
 value = `#{cmd}`
