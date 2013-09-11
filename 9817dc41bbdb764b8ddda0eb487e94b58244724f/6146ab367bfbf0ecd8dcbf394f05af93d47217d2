@@ -1,0 +1,46 @@
+this is a test
+>commit 9817dc41bbdb764b8ddda0eb487e94b58244724f
+>Author: Murtuza Mukadam <murtuza16289@gmail.com>
+>Date:   Wed Aug 21 10:07:17 2013 -0400
+>
+>    few changes to git review --pull
+>
+>diff --git a/scripts/git-review b/scripts/git-review
+>index 480ba81..a40f695 100755
+>--- a/scripts/git-review
+>+++ b/scripts/git-review
+>@@ -90,23 +90,23 @@ end
+>                  exit
+>           elsif opts[:pull] ==true
+>              
+>-                `git pull origin review:review`
+>+
+>  
+>                  `git clone -b review .git .git/review-workingdir`
+>-                 
+>                   #this to create the special workingdir
+>-                  `git remote add rwd .git/review-workingdir`
+>-                 
+>+                  
+>+                 `git remote add rwd .git/review-workingdir`
+>                    #that to create a remote pointing to it
+> 
+>-                   `git fetch origin review`
+>-                   `git push rwd origin/review:origin/review`
+>+                  `git fetch origin review`
+>+                  `git push -f rwd origin/review:origin/review`
+>                    #to push the origin/review branch to that repository
+>-                   `git --git-dir=.git/review-workingdir merge origin/review`
+>-                    `git fetch rwd review`
+>-                    `git branch -f review rwd/review` 
+>-                     `git remote rm rwd`
+>-                      `rm -r .git/review-working-dir`
+>+                   
+>+                   `git --git-dir=.git/review-workingdir/.git merge origin/review`
+>+                   `git fetch rwd`
+>+                   `git branch -f review rwd/review` 
+>+                   `git remote rm rwd`
+>+                   `rm -rf .git/review-workingdir`
+>                       exit
+>               
+>           elsif opts[:amend] ==true               
