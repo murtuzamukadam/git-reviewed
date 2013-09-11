@@ -418,8 +418,10 @@ end
                      check_list_commit.each do |n|
                            n=n.split(/\t/)[1]
                            list_review = `git log --numstat review |grep -B 5 #{n}`
-                                                       
                            list_review = list_review.split(/\n/)[0]
+                           if list_review.length==0
+                           next
+                           end
                            author = list_review.split("Author: ")[1]
                            author=author.split(/\n/)[0]
                            name = author.split(/\s/)[0]

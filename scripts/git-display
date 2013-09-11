@@ -27,11 +27,14 @@ open(my $fo, '>', $fileold) or die "Could not open file '$fileold' $!";
 
 my $value = 1;
 while(my $line = <$info1>) {
-       
+         
         if ( $value == 1 and $line =~ /^From/)  {
             $value = 0; 
-              
-            while(my $line = <$info>) {
+              print $fh "$line";
+              print $fh "___________________________________________________________________\n";
+              print $fo "$line";
+              print $fo "___________________________________________________________________\n";
+            while(my $line = <$info1>) {
                
                if ($line =~ /^diff/xms) { 
   
@@ -71,8 +74,8 @@ while(my $line = <$info1>) {
                      print $fo "--\n";
                     }
                 
-               elsif($line =~ /^\+/)  {
-                 
+               elsif($line =~ /^>+\s+\+/)  {
+                     
                      print $fo "\n";
                      print $fo "_______________________________________________________\n";
                      print $fh "$line"; 
@@ -81,8 +84,8 @@ while(my $line = <$info1>) {
                 
 	      }
 
-      elsif($line =~ /^\-/)  {
-		
+      elsif($line =~ /^>+\s+\-/)  {
+	     
              print $fh "\n"; 
              print $fh "________________________________________________________________\n";
              print $fo "$line"; 
@@ -90,8 +93,8 @@ while(my $line = <$info1>) {
                
           
 	}
-      elsif($line =~ /^\s/) { 
-            print $fo "$line"; 
+      elsif($line =~ /^>+\s/) { 
+            print $fo "$line";          
             print $fo "__________________________________________________________________\n";
             print $fh "$line";
             print $fh "__________________________________________________________________\n"; 
@@ -99,6 +102,7 @@ while(my $line = <$info1>) {
        }
          
       else {
+            
             print $fh "$line";
             print $fh "___________________________________________________________________\n";
             print $fo "$line";
