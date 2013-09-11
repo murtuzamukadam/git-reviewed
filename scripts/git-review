@@ -522,11 +522,10 @@ end
                 end
                 review_raw = `git rev-parse #{review_raw}`
                 review_raw = review_raw.strip
-                checkcontents = `git review --log`
-  	        checkcontents= checkcontents.split(/\n/)
-                matched_rowindex=checkcontents.index("Review #{review_raw}")
-                commithash = checkcontents[matched_rowindex+1]
-                commithash = commithash.split[2]
+                 checkcontents = `git log --numstat review | grep #{review_raw}`
+  	        checkcontents= checkcontents.split(/\//)[0]
+                checkcontents= checkcontents.split(/\t/)[2]
+                commithash=checkcontents.strip
                 stdin, stdout, stderr = Open3.popen3("git log -1 review  -- #{commithash}/#{review_raw}")
                 reviewer_details = stdout.read()
                 error = stderr.read()  
