@@ -190,8 +190,15 @@ end
                  end 
                
                 author_name = ARGV[0]
+                author_lname = ARGV[1]
                 author_name = author_name.strip
-                author_name = author_name.capitalize
+                author_name = author_name.upcase
+                if ARGV.length ==2
+                author_lname = author_lname.strip
+                author_lname = author_lname.upcase
+                author_name = author_name + author_lname
+                end
+ 
                 review_log_author = `git review-log-author #{author_name}`
                 if review_log_author.length == 0 
                    
@@ -404,8 +411,14 @@ end
                  end 
                
                 author_name = ARGV[0]
+                author_lname = ARGV[1]
                 author_name = author_name.strip
-                author_name = author_name.capitalize
+                author_name = author_name.upcase
+                if ARGV.length ==2
+                author_lname = author_lname.strip
+                author_lname = author_lname.upcase
+                author_name = author_name + author_lname
+                end
 		check_list = `git ls-tree review`
                 check_list =  check_list.split(/\n/)
                 l = check_list.length
@@ -425,8 +438,12 @@ end
                            author = list_review.split("Author: ")[1]
                            author=author.split(/\n/)[0]
                            name = author.split(/\s/)[0]
-                           last_name = author.split(/\s/)[1]               
-                           if author_name!=last_name && author_name!=name 
+                           name = name.upcase
+                           last_name = author.split(/\s/)[1]
+                           last_name = last_name.upcase
+                           full_name = name + last_name 
+                           full_name = full_name.strip              
+                           if author_name!=last_name && author_name!=name && author_name!=full_name
                               reviewdel =  `git review --rm #{n}`
                               puts reviewdel  
                            end

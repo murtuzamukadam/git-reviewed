@@ -4,10 +4,6 @@ my $author = $ARGV[0];
 my $flag = 0; 
 my $log = '';
 
-#if(length($commithash) != 0)
- #{
-  # $flag =1;
- #} 
 
 
 OUTER:
@@ -18,22 +14,23 @@ foreach my $rev (`git rev-list review --pretty=oneline`) {
        $sha1 =~ s/^\s+//;
        $sha1 =~ s/\s+$//;
        my $log = `git log -1 $sha1`;
-       #print "$log\n";
        $removecheck = (split('Author: ', $log))[1];
        $removecheck = (split('\n', $removecheck))[0];
        $name = (split('\s', $removecheck))[0];
+       $name = uc($name);
        $lastname = (split('\s', $removecheck))[1];
-       #print "$name\n";
-       #print "$lastname\n";
-       if ($name eq $author || $lastname eq $author) {
-    #print "$removecheck contains $author\n";
+       $lastname = uc($lastname);
+       $fullname = $name.$lastname;
+       
+       if ($name eq $author || $lastname eq $author || $fullname eq $author) {
+    
     $flag=1;
 } 
 
 
 else {
           $flag=0;
-     #print "Please specify first name or last name of author\n";
+    
  }
        
 
