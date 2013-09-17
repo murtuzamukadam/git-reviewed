@@ -345,7 +345,7 @@ end
                    check_list = `git ls-tree review -r`
                    check_list =  check_list.split(/\n/)
                    l = check_list.length
-                   list=""
+                   list="Total Number of Reviews: #{l}\n"
                    check_list.each do |commitid|
                          
                         commitid=commitid.split(/\t/)
