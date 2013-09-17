@@ -428,7 +428,7 @@ end
                            commitid=commitid[1].split("/")
                            commit = commitid[0]
                            reviewid = commitid[1]
-                           list_review = `git log --numstat review |grep -B 5 #{reviewid}`
+                           list_review = `git log --numstat review |grep -B 5 /#{reviewid}`
                            list_review = list_review.split(/\n/)[0]
                            if list_review.length==0
                            next
