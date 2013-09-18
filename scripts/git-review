@@ -126,9 +126,15 @@ end
 		review_log = `git review-log`
 		review_log = review_log.split(/\n/)[1]
 		review_hash = review_log.split[1]                        
-		cmd = `git review --show-raw #{review_hash}`
-		tree_hash= cmd.lines.first
-		tree_hash= tree_hash.split[2]             #Getting the tree the review belongs to
+		get_tree = `git log --numstat review | grep /#{review_hash}`
+                get_tree = get_tree.split(/\n/)
+                get_tree = get_tree[0].split(/\t/)
+                tree_hash = get_tree[2].split(/\//)[0]
+                 if(!tree_hash)
+		  get_tree = `git review --show-raw #{review_del}`
+                  tree_hash= get_tree.lines.first
+                  tree_hash= tree_hash.split[2]
+                end         #Getting the tree the review belongs to
 		value = `git show #{review_hash}`
 		amended_hash = make_review(value)
 		checkcontents = `git ls-tree review:#{tree_hash}`
@@ -314,9 +320,15 @@ end
                 end 
                 review_del = `git rev-parse #{review_del}`
                 review_del = review_del.strip
-		get_tree = `git review --show-raw #{review_del}`
-                tree_hash= get_tree.lines.first
-                tree_hash= tree_hash.split[2] 
+                get_tree = `git log --numstat review | grep /#{review_del}`
+                get_tree = get_tree.split(/\n/)
+                get_tree = get_tree[0].split(/\t/)
+                tree_hash = get_tree[2].split(/\//)[0]
+                if(!tree_hash)
+		  get_tree = `git review --show-raw #{review_del}`
+                  tree_hash= get_tree.lines.first
+                  tree_hash= tree_hash.split[2]
+                end 
                 tree_contents_rm= `git ls-tree review:#{tree_hash}`            
                 checkreviewcontents= tree_contents_rm.split("\n").map {|row| row.split()}
   	        matched_rowindex=checkreviewcontents.find_index {|row| row[3]==review_del }
@@ -472,16 +484,20 @@ end
                 check = `git show #{review_raw}`
                 check_commit = check.split(/\n/)
                 if(check_commit[0][/^From/] || check_commit[0][/^>+From/])
-                    check =~ /^commit:(.*)/
-                    commitid = $1
-                    reviewer = check_commit[0].split("From : ")[1]
                     
-                    check =~ /^Date :(.*)/
+                    
+                    check =~ /commit:(.*)/
+                    commitid = $1
+                
+                    reviewer = check_commit[0].split("From : ")[1]
+                  
+                    check =~ /Date :(.*)/
                     date = $1
                    
                     
                     
                     if(commitid && reviewer && date)
+                       
                       date = date.strip
                       reviewer = reviewer.strip
                       commitid = commitid.strip
@@ -538,6 +554,11 @@ end
                 get_tree = get_tree.split(/\n/)
                 get_tree = get_tree[0].split(/\t/)
                 tree_hash = get_tree[2].split(/\//)[0]
+                 if(!tree_hash)
+		  get_tree = `git review --show-raw #{review_del}`
+                  tree_hash= get_tree.lines.first
+                  tree_hash= tree_hash.split[2]
+                end 
                 response=`git show #{review_respond}`
                 response.gsub!(/^/, ">") 
                 review_hash_respond = make_review(response) 

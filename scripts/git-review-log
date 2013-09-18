@@ -11,6 +11,7 @@ if(length($commithash) != 0)
 
 
 
+
 my $rev = `git log --no-merges --numstat review`;
 open my $fh, '<', \$rev or die $!;
 while (<$fh>) {
