@@ -469,7 +469,37 @@ end
                 end
                 review_raw = `git rev-parse #{review_raw}`
                 review_raw = review_raw.strip
-                 checkcontents = `git log --numstat review | grep #{review_raw}`
+                check = `git show #{review_raw}`
+                check_commit = check.split(/\n/)
+                if(check_commit[0][/^From/] || check_commit[0][/^>+From/])
+                    check =~ /^commit:(.*)/
+                    commitid = $1
+                    reviewer = check_commit[0].split("From : ")[1]
+                    
+                    check =~ /^Date :(.*)/
+                    date = $1
+                   
+                    
+                    
+                    if(commitid && reviewer && date)
+                      date = date.strip
+                      reviewer = reviewer.strip
+                      commitid = commitid.strip
+                      disp = "Commit Reviewed: #{commitid}\n"
+                      disp = disp + "Reviewer: #{reviewer}\n"
+                      disp = disp + "Date: #{date}\n\n"
+                      disp = disp + "---------------------------------------------------------------\n"
+                      disp = disp + check
+                      begin
+                        IO.popen("less", "w") { |f| f.puts disp}
+                      rescue Errno::EPIPE
+                       #do nothing
+                      end
+                      exit
+                      end
+                
+                end 
+                checkcontents = `git log --numstat review | grep /#{review_raw}`
   	        checkcontents= checkcontents.split(/\//)[0]
                 checkcontents= checkcontents.split(/\t/)[2]
                 commithash=checkcontents.strip
@@ -478,6 +508,7 @@ end
                 error = stderr.read()  
                 raw = "Commit Reviewed: #{commithash}\nReviewer"
                 raw=raw + reviewer_details[54..-1]
+                raw=raw + "---------------------------------------------------------------\n"
                 review_show_raw= %x(git cat-file -p #{review_raw})
                 raw = raw + review_show_raw
                 begin
@@ -503,9 +534,10 @@ end
                 end
                 review_respond = `git rev-parse #{review_respond}`
                 review_respond = review_respond.strip 
-                get_tree = `git review --show-raw #{review_respond}`
-                tree_hash= get_tree.lines.first
-                tree_hash= tree_hash.split[2] 
+                get_tree = `git log --numstat review | grep /#{review_respond}`
+                get_tree = get_tree.split(/\n/)
+                get_tree = get_tree[0].split(/\t/)
+                tree_hash = get_tree[2].split(/\//)[0]
                 response=`git show #{review_respond}`
                 response.gsub!(/^/, ">") 
                 review_hash_respond = make_review(response) 
