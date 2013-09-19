@@ -149,19 +149,19 @@ end
 		review_log = review_log.split(/\n/)[1]
 		review_hash = review_log.split[1]                        
 		get_tree = `git log --numstat review | grep /#{review_hash}`
-                begin
-                get_tree = get_tree.split(/\n/)
-                get_tree = get_tree[0].split(/\t/)
-                tree_hash = get_tree[2].split(/\//)[0]
-                 rescue NoMethodError
-                 puts "--amend needs a review hash. Check git review --help"
-                 exit
-                 end
-                 if(!tree_hash)
+                begin                                                 #Faster way to get tree hash
+                  get_tree = get_tree.split(/\n/)
+                  get_tree = get_tree[0].split(/\t/)
+                  tree_hash = get_tree[2].split(/\//)[0]
+                rescue NoMethodError
+                  puts "--amend needs a review hash. Check git review --help"
+                  exit
+                end
+                if(!tree_hash)
 		  get_tree = `git review --show-raw #{review_del}`
                   tree_hash= get_tree.lines.first
                   tree_hash= tree_hash.split[2]
-                end         #Getting the tree the review belongs to
+                end                                                   #Alternative incase above fails to Get the tree the review belongs to
 		value = `git show #{review_hash}`
 		amended_hash = make_review(value)
 		checkcontents = `git ls-tree review:#{tree_hash}`
@@ -176,8 +176,7 @@ end
 
            elsif opts[:log]==true
                 
-               
-		 if ARGV.length ==0
+                if ARGV.length ==0
 		    review_log=`git review-log` 
                     begin
                     IO.popen("less", "w") { |f| f.puts review_log}                  
@@ -185,93 +184,80 @@ end
                      #do nothing
                     end
                     exit
-
-                 end 
-               
-                commit_hash = ARGV[0]
+                end 
+                commit_hash = ARGV[0]                                   #log for a particular commit only
                 check= `git cat-file -t #{commit_hash}`
                 check=check.strip
                 if check != "commit"
                    puts "--log needs a commit hash. Check git review --help"
                    exit
                 end
-                
                 stdin, stdout, stderr = Open3.popen3("git rev-parse #{commit_hash}")
                 commit_hash = stdout.read()
                 error = stderr.read()
                 commit_hash = commit_hash.strip
                 review_log_commit = `git review-log #{commit_hash}`
-                
                 if review_log_commit.length == 0 
-                   
                     puts "No reviews found for commit #{commit_hash}"
                     exit
                 end
                 begin
-                IO.popen("less", "w") { |f| f.puts review_log_commit}
+                   IO.popen("less", "w") { |f| f.puts review_log_commit}
                 rescue Errno::EPIPE
                      #do nothing
-                    end
+                end
                 exit
 
              elsif opts[:log_limit]==true
-                
-               
+          
 		 if ARGV.length ==0
 		   puts "--log-limit requires an argument. Check git review --help"
                    exit
                  else 
                     review_log_limit =`git review-log-limit #{ARGV[0]}` 
                     begin
-                    IO.popen("less", "w") { |f| f.puts review_log_limit}                  
+                      IO.popen("less", "w") { |f| f.puts review_log_limit}                  
                     rescue Errno::EPIPE
-                     #do nothing
+                      #do nothing
                     end
                  end 
-                 
                  exit
             
-            elsif opts[:log_author]==true
+             elsif opts[:log_author]==true
                 
-                 if ARGV.length ==0
+                if ARGV.length ==0
                    puts " --log-author needs an author name. Check git review --help"
                    exit               
-		 
-                 end 
-               
+		end 
                 author_name = ARGV[0]
                 author_lname = ARGV[1]
                 author_name = author_name.strip
                 author_name = author_name.upcase
                 if ARGV.length ==2
-                author_lname = author_lname.strip
-                author_lname = author_lname.upcase
-                author_name = author_name + author_lname
+                  author_lname = author_lname.strip
+                  author_lname = author_lname.upcase
+                  author_name = author_name + author_lname
                 end
- 
                 review_log_author = `git review-log-author #{author_name}`
                 if review_log_author.length == 0 
-                   
-                    puts "No reviews found for author #{author_name}"
-                exit
+                  puts "No reviews found for author #{author_name}"
+                  exit
                 end
                 begin
-                IO.popen("less", "w") { |f| f.puts review_log_author}                  
+                  IO.popen("less", "w") { |f| f.puts review_log_author}                  
                 rescue Errno::EPIPE
                      #do nothing
-                    end 
+                end 
                 exit         
 
 
    
           elsif opts[:format]==true
-                
-           
+              
                 if ARGV.length ==0
                    puts " --format needs a review hash. Check git review --help"
                    exit
                 end
-               
                 review_format = ARGV[0] 
                 check= `git cat-file -t #{review_format}`
                 check=check.strip
@@ -288,19 +274,15 @@ end
                
             elsif opts[:log_show]==true
                 
-		
                  if ARGV.length ==0
 		    review_log_show =`git review-log-show`
                     begin
-                    IO.popen("less", "w") { |f| f.puts review_log_show}   
+                      IO.popen("less", "w") { |f| f.puts review_log_show}   
                     rescue Errno::EPIPE
-                     #do nothing
+                      #do nothing
                     end
-                                
-                     
                     exit
-                end 
-               
+                 end 
                 commit_hash = ARGV[0]
                 check= `git cat-file -t #{commit_hash}`
                 check=check.strip
@@ -313,27 +295,23 @@ end
                 error = stderr.read()              
                 commit_hash = commit_hash.strip
                 review_log_show = `git review-log-show #{commit_hash}`
-                 
                 if review_log_show.length == 0 
-                   
                     puts "No reviews found for commit #{commit_hash}"
-                exit
+                    exit
                 end
                 begin
-                IO.popen("less", "w") { |f| f.puts review_log_show}                  
+                  IO.popen("less", "w") { |f| f.puts review_log_show}                  
                 rescue Errno::EPIPE
                      #do nothing
-                    end 
+                end 
                 exit 
            
             elsif opts[:display]==true
-               
-
+              
                 if ARGV.length ==0
                    puts " --display needs a review hash. Check git review --help"
                    exit
                 end
-               
                 review_display = ARGV[0] 
                 check= `git cat-file -t #{review_display}`
                 check=check.strip
@@ -348,8 +326,7 @@ end
                 exit 
 
             elsif opts[:rm]==true
-               
-                                 
+                                  
                 if ARGV.length ==0
                    puts " --display needs a review hash. Check git review --help"
                    exit
@@ -357,9 +334,6 @@ end
                  if ARGV[1]=="filter_author"
                    flag=1
                 end
-                
-                
-
                 review_del = ARGV[0]
                 check= `git cat-file -t #{review_del}`
                 check=check.strip
@@ -369,35 +343,28 @@ end
                 end 
                 review_del = `git rev-parse #{review_del}`
                 review_del = review_del.strip
-
                 if flag==1
-                 commitid = ARGV[2]
-                 
-                 
-                 delete(commitid,review_del)
-                
+                   commitid = ARGV[2]
+                   delete(commitid,review_del)
                 else
-                get_tree = `git log --numstat review | grep /#{review_del}`
-                begin
-                get_tree = get_tree.split(/\n/)
-                get_tree = get_tree[0].split(/\t/)
-                tree_hash = get_tree[2].split(/\//)[0]
-                 rescue NoMethodError
-                 puts "--rm needs a review hash. Check git review --help"
-                 exit
-                 end
-                if(!tree_hash)
-		  get_tree = `git review --show-raw #{review_del}`
-                  tree_hash= get_tree.lines.first
-                  tree_hash= tree_hash.split[2]
-                end 
-                delete(tree_hash, review_del)
+                    get_tree = `git log --numstat review | grep /#{review_del}`
+                    begin
+                       get_tree = get_tree.split(/\n/)
+                       get_tree = get_tree[0].split(/\t/)
+                       tree_hash = get_tree[2].split(/\//)[0]
+                    rescue NoMethodError
+                       puts "--rm needs a review hash. Check git review --help"
+                       exit
+                    end
+                    if(!tree_hash)
+		        get_tree = `git review --show-raw #{review_del}`
+                        tree_hash= get_tree.lines.first
+                        tree_hash= tree_hash.split[2]
+                    end 
+                    delete(tree_hash, review_del)
                 end
-               
                 exit
-
-                   
-              
+  
              elsif opts[:list]==true
              
                 if ARGV.length ==0
@@ -406,7 +373,6 @@ end
                    l = check_list.length
                    list="Total Number of Reviews: #{l}\n"
                    check_list.each do |commitid|
-                         
                         commitid=commitid.split(/\t/)
                         commitid=commitid[1].split("/")
                         commit = commitid[0]
@@ -414,16 +380,13 @@ end
                         list= list + "\nReview: #{reviewid}"
                         list = list + "\nCommit Reviewed: #{commit}\n"
                         end
-                   
                    begin
-                   IO.popen("less", "w") { |f| f.puts list}
+                     IO.popen("less", "w") { |f| f.puts list}
                    rescue Errno::EPIPE
                      #do nothing
-                    end
+                   end
                    exit
                 end
-                
-
                 commit_hash = ARGV[0]
                 check= `git cat-file -t #{commit_hash}`
                 check=check.strip
@@ -431,7 +394,6 @@ end
                    puts "--list needs a commit hash. Check git review --help"
                    exit
                 end
-                
                 stdin, stdout, stderr = Open3.popen3("git rev-parse #{commit_hash}")
                 commit_hash = stdout.read()
                 error = stderr.read()
@@ -443,46 +405,39 @@ end
                 check_list.each do |n|
                       n=n.split(/\t/)
                       list= list + "\nReview: #{n[1]}\n"
-                      
                 end 
-                
                 if list.length == 0 
-                   
                     puts "No reviews found for commit #{commit_hash}"
                     exit
                 end
                 begin
-                IO.popen("less", "w") { |f| f.puts list}
+                  IO.popen("less", "w") { |f| f.puts list}
                 rescue Errno::EPIPE
                      #do nothing
-                    end              
+                end              
                 exit
              
               
              elsif opts[:filter_author]==true
              
                 if ARGV.length ==0
-
                    puts " --log-author needs an author name. Check git review --help"
                    exit               
-		 
-                 end 
-               
+		end 
                 author_name = ARGV[0]
                 author_lname = ARGV[1]
                 author_name = author_name.strip
                 author_name = author_name.upcase
                 if ARGV.length ==2
-                author_lname = author_lname.strip
-                author_lname = author_lname.upcase
-                author_name = author_name + author_lname
+                   author_lname = author_lname.strip
+                   author_lname = author_lname.upcase
+                   author_name = author_name + author_lname
                 end
 		check_list = `git ls-tree review -r`
                 check_list =  check_list.split(/\n/)
                 l = check_list.length
                 list=""
                 check_list.each do |commitid|
-                     
                            commitid=commitid.split(/\t/)
                            commitid=commitid[1].split("/")
                            commit = commitid[0]
@@ -490,7 +445,7 @@ end
                            list_review = `git log --numstat review |grep -B 5 /#{reviewid}`
                            list_review = list_review.split(/\n/)[0]
                            if list_review.length==0
-                           next
+                              next
                            end
                            author = list_review.split("Author: ")[1]
                            author=author.split(/\n/)[0]
@@ -508,7 +463,6 @@ end
                              
                            end
                     end
-              
                 exit
                 
 
@@ -518,7 +472,6 @@ end
                    puts " --show-raw needs a review hash. Check git review --help"
                    exit
                 end
-               
                 review_raw = ARGV[0]
                 check= `git cat-file -t #{review_raw}`
                 check=check.strip
@@ -530,21 +483,13 @@ end
                 review_raw = review_raw.strip
                 check = `git show #{review_raw}`
                 check_commit = check.split(/\n/)
-                if(check_commit[0][/^From/] || check_commit[0][/^>+From/])
-                    
-                    
+                if(check_commit[0][/^From/] || check_commit[0][/^>+From/])         #Faster alternative for linux reviews
                     check =~ /commit:(.*)/
                     commitid = $1
-                
                     reviewer = check_commit[0].split("From : ")[1]
-                  
                     check =~ /Date :(.*)/
                     date = $1
-                   
-                    
-                    
                     if(commitid && reviewer && date)
-                       
                       date = date.strip
                       reviewer = reviewer.strip
                       commitid = commitid.strip
@@ -559,8 +504,7 @@ end
                        #do nothing
                       end
                       exit
-                      end
-                
+                    end
                 end 
                 checkcontents = `git log --numstat review | grep /#{review_raw}`
   	        checkcontents= checkcontents.split(/\//)[0]
@@ -587,7 +531,6 @@ end
                     puts " --respond needs a review hash. Check git review --help"
                     exit
                 end
-               
                 review_respond = ARGV[0] 
                 check= `git cat-file -t #{review_respond}`
                 check=check.strip
@@ -598,16 +541,15 @@ end
                 review_respond = `git rev-parse #{review_respond}`
                 review_respond = review_respond.strip 
                 get_tree = `git log --numstat review | grep /#{review_respond}`
-                
                 begin
-                get_tree = get_tree.split(/\n/)
-                get_tree = get_tree[0].split(/\t/)
-                tree_hash = get_tree[2].split(/\//)[0]
+                  get_tree = get_tree.split(/\n/)
+                  get_tree = get_tree[0].split(/\t/)
+                  tree_hash = get_tree[2].split(/\//)[0]
                 rescue NoMethodError
-                 puts "--respond needs a review hash. Check git review --help"
-                 exit
-                 end
-                 if(!tree_hash)
+                  puts "--respond needs a review hash. Check git review --help"
+                  exit
+                end
+                if(!tree_hash)
 		  get_tree = `git review --show-raw #{review_del}`
                   tree_hash= get_tree.lines.first
                   tree_hash= tree_hash.split[2]
@@ -624,7 +566,6 @@ end
                 command_respond= "git commit-tree #{tree_hashT1} -p review "
                 commit_tree(tree_hashT1,message_respond,command_respond)
                 exit                 
-                
            end
 
 if ARGV.length == 1 
