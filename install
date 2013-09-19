@@ -12,6 +12,8 @@ chown root:root /usr/local/bin/git-review-format
 cp scripts/git-review-log /usr/local/bin/git-review-log
 chown root:root /usr/local/bin/git-review-log
 
+cp scripts/git-review-log-limit /usr/local/bin/git-review-log-limit
+chown root:root /usr/local/bin/git-review-log-limit
 
 cp scripts/git-review-log-show /usr/local/bin/git-review-log-show
 chown root:root /usr/local/bin/git-review-log-show

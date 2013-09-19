@@ -75,6 +75,7 @@ EOS
   opt :amend, "Change the last review committed"
   opt :log, "Display log history for all reviews done"
   opt :log_author, "Displays log history of all reviews made by a particular author" 
+  opt :log_limit, "Displays log history of all reviews limiting it to a certain value"
   opt :respond, "Respond to a review"
   opt :show_raw, "Display raw review contents"
   opt :log_show, "Displays the log history for all reviews along with the raw content"
@@ -132,7 +133,7 @@ end
                 get_tree = get_tree[0].split(/\t/)
                 tree_hash = get_tree[2].split(/\//)[0]
                  rescue NoMethodError
-                 puts "--respond needs a review hash. Check git review --help"
+                 puts "--amend needs a review hash. Check git review --help"
                  exit
                  end
                  if(!tree_hash)
@@ -191,6 +192,23 @@ end
                      #do nothing
                     end
                 exit
+
+             elsif opts[:log_limit]==true
+                
+               
+		 if ARGV.length ==0
+		   puts "--log-limit requires an argument. Check git review --help"
+                   exit
+                 else 
+                    review_log_limit =`git review-log-limit #{ARGV[0]}` 
+                    begin
+                    IO.popen("less", "w") { |f| f.puts review_log_limit}                  
+                    rescue Errno::EPIPE
+                     #do nothing
+                    end
+                 end 
+                 
+                 exit
             
             elsif opts[:log_author]==true
                 
