@@ -61,7 +61,28 @@ def search(commit_hash,tree_hashT2)
         return tree_contentsT1
 end 	
 
+def delete(tree_hash,review_del)
 
+                tree_contents_rm= `git ls-tree review:#{tree_hash}`            
+                checkreviewcontents= tree_contents_rm.split("\n").map {|row| row.split()}
+  	        matched_rowindex=checkreviewcontents.find_index {|row| row[3]==review_del }
+    
+                if matched_rowindex == nil
+                   puts "Review not found"
+                   exit
+                end
+             
+                checkreviewcontents.delete_at(matched_rowindex)  
+                checkreviewcontents=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line [3]}.join "\n" 
+                tree_hashT2 = create_treeT2(checkreviewcontents)    
+                tree_contentsT1 = search(tree_hash,tree_hashT2)
+                tree_hashT1 = create_treeT1(tree_contentsT1)
+                message= "Review #{review_del} has been deleted"
+                command= "git commit-tree #{tree_hashT1} -p review "
+                commit_tree(tree_hashT1,message,command)
+                puts "Review #{review_del} deleted successfully"
+
+               end
 
 
 opts = Trollop::options do
@@ -328,12 +349,17 @@ end
 
             elsif opts[:rm]==true
                
-
+                                 
                 if ARGV.length ==0
                    puts " --display needs a review hash. Check git review --help"
                    exit
                 end
-               
+                 if ARGV[1]=="filter_author"
+                   flag=1
+                end
+                
+                
+
                 review_del = ARGV[0]
                 check= `git cat-file -t #{review_del}`
                 check=check.strip
@@ -343,6 +369,14 @@ end
                 end 
                 review_del = `git rev-parse #{review_del}`
                 review_del = review_del.strip
+
+                if flag==1
+                 commitid = ARGV[2]
+                 
+                 
+                 delete(commitid,review_del)
+                
+                else
                 get_tree = `git log --numstat review | grep /#{review_del}`
                 begin
                 get_tree = get_tree.split(/\n/)
@@ -357,24 +391,9 @@ end
                   tree_hash= get_tree.lines.first
                   tree_hash= tree_hash.split[2]
                 end 
-                tree_contents_rm= `git ls-tree review:#{tree_hash}`            
-                checkreviewcontents= tree_contents_rm.split("\n").map {|row| row.split()}
-  	        matched_rowindex=checkreviewcontents.find_index {|row| row[3]==review_del }
-    
-                if matched_rowindex == nil
-                   puts "Review not found"
-                   exit
+                delete(tree_hash, review_del)
                 end
-             
-                checkreviewcontents.delete_at(matched_rowindex)  
-                checkreviewcontents=checkreviewcontents.map{|line| line[0..2].join(" ") + "\t" + line [3]}.join "\n" 
-                tree_hashT2 = create_treeT2(checkreviewcontents)    
-                tree_contentsT1 = search(tree_hash,tree_hashT2)
-                tree_hashT1 = create_treeT1(tree_contentsT1)
-                message= "Review #{review_del} has been deleted"
-                command= "git commit-tree #{tree_hashT1} -p review "
-                commit_tree(tree_hashT1,message,command)
-                puts "Review #{review_del} deleted successfully"
+               
                 exit
 
                    
@@ -484,7 +503,7 @@ end
                            full_name1 = last_name + name 
                            full_name1 = full_name1.strip              
                            if author_name!=last_name && author_name!=name && author_name!=full_name && author_name!=full_name1 
-                              reviewdel =  `git review --rm #{reviewid}`
+                              reviewdel =  `git review --rm "#{reviewid}" "filter_author" "#{commit}" `
                               puts reviewdel  
                              
                            end
