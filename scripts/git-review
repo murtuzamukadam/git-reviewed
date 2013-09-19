@@ -127,9 +127,14 @@ end
 		review_log = review_log.split(/\n/)[1]
 		review_hash = review_log.split[1]                        
 		get_tree = `git log --numstat review | grep /#{review_hash}`
+                begin
                 get_tree = get_tree.split(/\n/)
                 get_tree = get_tree[0].split(/\t/)
                 tree_hash = get_tree[2].split(/\//)[0]
+                 rescue NoMethodError
+                 puts "--respond needs a review hash. Check git review --help"
+                 exit
+                 end
                  if(!tree_hash)
 		  get_tree = `git review --show-raw #{review_del}`
                   tree_hash= get_tree.lines.first
@@ -321,9 +326,14 @@ end
                 review_del = `git rev-parse #{review_del}`
                 review_del = review_del.strip
                 get_tree = `git log --numstat review | grep /#{review_del}`
+                begin
                 get_tree = get_tree.split(/\n/)
                 get_tree = get_tree[0].split(/\t/)
                 tree_hash = get_tree[2].split(/\//)[0]
+                 rescue NoMethodError
+                 puts "--rm needs a review hash. Check git review --help"
+                 exit
+                 end
                 if(!tree_hash)
 		  get_tree = `git review --show-raw #{review_del}`
                   tree_hash= get_tree.lines.first
@@ -551,9 +561,15 @@ end
                 review_respond = `git rev-parse #{review_respond}`
                 review_respond = review_respond.strip 
                 get_tree = `git log --numstat review | grep /#{review_respond}`
+                
+                begin
                 get_tree = get_tree.split(/\n/)
                 get_tree = get_tree[0].split(/\t/)
                 tree_hash = get_tree[2].split(/\//)[0]
+                rescue NoMethodError
+                 puts "--respond needs a review hash. Check git review --help"
+                 exit
+                 end
                  if(!tree_hash)
 		  get_tree = `git review --show-raw #{review_del}`
                   tree_hash= get_tree.lines.first
