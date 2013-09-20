@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 my $n = $ARGV[0];
-
+$n = $n+1;
 my $rev = `git log -n $n --no-merges --numstat review`;
 open my $fh, '<', \$rev or die $!;
 while (<$fh>) {
