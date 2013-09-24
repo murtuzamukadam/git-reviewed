@@ -7,7 +7,7 @@ include Open3
 
 def make_review_mbox
 	
-        create_review = "git hash-object -w data.tmp"
+        create_review = "git hash-object -w /tmp/data.tmp"
 	review_hash = `#{create_review}`
 	review_hash = review_hash.strip
 	puts review_hash

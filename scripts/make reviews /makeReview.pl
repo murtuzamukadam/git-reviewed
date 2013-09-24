@@ -34,7 +34,7 @@ for my $msg ($mb->get_messages) {
     
        if ($row) {
               my ($tid, $commitid) = @$row;
-              open (MYFILE, '> data.tmp');
+              open (MYFILE, '> /tmp/data.tmp');
               print MYFILE "From : $from\n";
               if ( $from =~ /<(.*?)>/ )
 		{
@@ -71,7 +71,7 @@ for my $msg ($mb->get_messages) {
              my $row = $sth->fetchrow_arrayref();       
              if ($row) {
                 my ($tid, $commitid) = @$row;
-                open (MYFILE, '> data.tmp');
+                open (MYFILE, '> /tmp/data.tmp');
                 print MYFILE "From : $from\n";
                 if ( $from =~ /<(.*?)>/ )
 		 {
