@@ -13,7 +13,8 @@ my $parseropts = {
         enable_grep     => 1,
         cache_file_name => 'mail/cache-file',
      };
-my $mb = Mail::MboxParser->new($ARGV[0],
+foreach my $arg(@ARGV){
+my $mb = Mail::MboxParser->new($arg,
                                     decode     => 'ALL',
                                     parseropts => $parseropts);
 for my $msg ($mb->get_messages) {
@@ -56,9 +57,10 @@ for my $msg ($mb->get_messages) {
               print MYFILE "commit: $commitid\n\n";
               print MYFILE "$body_str";
               close (MYFILE); 
+              if ($from =~ /^[A-z]/ ) {
               my $show =`git reviewmbox '$commitid' '$from' '$date' '$email'`;
               print $show;
-              
+              }
              
 
           } 
@@ -86,17 +88,18 @@ for my $msg ($mb->get_messages) {
                print MYFILE "Cc: $cc\n";
                print MYFILE "commit: $commitid\n\n";
                print MYFILE "$body_str";
-               close (MYFILE);   
+               close (MYFILE);
+               if ($from =~ /^[A-z]/ ) {   
                my $response =`git reviewmbox '$commitid' '$from' '$date' '$email'`;
                print $response;
-            
+               }
               }
-         
+       
        }
 
 
         
 }
-
+}
 $dbh->disconnect();
 exit 0;
