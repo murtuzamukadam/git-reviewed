@@ -514,8 +514,8 @@ end
                 reviewer_details = stdout.read()
                 error = stderr.read()  
                 raw = "Commit Reviewed: #{commithash}\nReviewer"
-                raw=raw + reviewer_details[54..-70]
-                raw=raw + "---------------------------------------------------------------\n"
+                raw=raw + reviewer_details[54..-42]
+                raw=raw + "-----------------------------------------------------------------\n"
                 review_show_raw= %x(git cat-file -p #{review_raw})
                 raw = raw + review_show_raw
                 begin
