@@ -88,14 +88,14 @@ def delete(tree_hash,review_del)
 opts = Trollop::options do
   
   banner <<-EOS
-  Creates a review object on a commit
+  Creates a review on a commit
 
 
 EOS
   opt :init, "Initialize the repository to start reviewing" 
   opt :amend, "Change the last review committed"
   opt :log, "Display log history for all reviews done"
-  opt :log_author, "Displays log history of all reviews made by a particular author" 
+  opt :log_reviewer, "Displays log history of all reviews made by a particular reviewer" 
   opt :log_limit, "Displays log history of all reviews limiting it to a certain value"
   opt :respond, "Respond to a review"
   opt :show_raw, "Display raw review contents"
@@ -106,7 +106,7 @@ EOS
   opt :display, "Displays the review along with interleaved history"
   opt :rm, "Deletes the review"
   opt :list, "View list of reviews for a particular commit"
-  opt :filter_author, "Deletes all reviews except the author specified"
+  opt :filter_reviewer, "Deletes all reviews except the committer specified"
 end
           if opts[:init] ==true
                
@@ -170,6 +170,12 @@ end
 		tree_contentsT1_amend = search(tree_hash,tree_hashT2_amend)
 		tree_hashT1_amend = create_treeT1(tree_contentsT1_amend)
    		message_amend= "Amended Review #{review_hash}"
+                author = `git log -1 --pretty=%an #{tree_hash}`
+		author_email = `git log -1 --pretty=%ae #{tree_hash}`
+		author_date = `git log -1 --pretty=%ad #{tree_hash}`
+		ENV['GIT_AUTHOR_NAME'] = author
+		ENV['GIT_AUTHOR_EMAIL'] = author_email
+		ENV['GIT_AUTHOR_DATE'] = author_date
     	        command_amend= "git commit-tree #{tree_hashT1_amend} -p review"
                 commit_tree(tree_hashT1_amend,message_amend,command_amend)
 		exit
@@ -223,10 +229,10 @@ end
                  end 
                  exit
             
-             elsif opts[:log_author]==true
+             elsif opts[:log_reviewer]==true
                 
                 if ARGV.length ==0
-                   puts " --log-author needs an author name. Check git review --help"
+                   puts " --log-reviewer needs a reviewer name. Check git review --help"
                    exit               
 		end 
                 author_name = ARGV[0]
@@ -238,9 +244,9 @@ end
                   author_lname = author_lname.upcase
                   author_name = author_name + author_lname
                 end
-                review_log_author = `git review-log-author #{author_name}`
+                review_log_author = `git review-log-reviewer #{author_name}`
                 if review_log_author.length == 0 
-                  puts "No reviews found for author #{author_name}"
+                  puts "No reviews found for reviewer #{author_name}"
                   exit
                 end
                 begin
@@ -418,10 +424,10 @@ end
                 exit
              
               
-             elsif opts[:filter_author]==true
+             elsif opts[:filter_reviewer]==true
              
                 if ARGV.length ==0
-                   puts " --log-author needs an author name. Check git review --help"
+                   puts " --filter-reviewer needs a reviewer name. Check git review --help"
                    exit               
 		end 
                 author_name = ARGV[0]
@@ -495,9 +501,11 @@ end
                       commitid = commitid.strip
                       disp = "Commit Reviewed: #{commitid}\n"
                       disp = disp + "Reviewer: #{reviewer}\n"
-                      disp = disp + "Date: #{date}\n\n"
+                      disp = disp + "Reviewer Date: #{date}\n"
                       disp = disp + "---------------------------------------------------------------\n"
                       disp = disp + check
+
+
                       begin
                         IO.popen("less", "w") { |f| f.puts disp}
                       rescue Errno::EPIPE
@@ -510,11 +518,20 @@ end
   	        checkcontents= checkcontents.split(/\//)[0]
                 checkcontents= checkcontents.split(/\t/)[2]
                 commithash=checkcontents.strip
-                stdin, stdout, stderr = Open3.popen3("git log -1 review  -- #{commithash}/#{review_raw}")
+                stdin, stdout, stderr = Open3.popen3("git log -1 review  --pretty=fuller -- #{commithash}/#{review_raw}")
                 reviewer_details = stdout.read()
-                error = stderr.read()  
-                raw = "Commit Reviewed: #{commithash}\nReviewer"
-                raw=raw + reviewer_details[54..-42]
+                error = stderr.read() 
+                reviewer_details = reviewer_details.split(/\n/)
+                reviewer = reviewer_details[3]
+                
+                reviewer = reviewer.split("Commit:\s")[1]
+                reviewer = reviewer.strip
+                review_date = reviewer_details[4]
+                review_date = review_date.split("CommitDate:\s")[1]
+                review_date = review_date.strip
+                raw = "Commit Reviewed: #{commithash}\nReviewer: "
+                raw=raw + "#{reviewer}\n" 
+                raw = raw + "Review Date: #{review_date}\n"
                 raw=raw + "-----------------------------------------------------------------\n"
                 review_show_raw= %x(git cat-file -p #{review_raw})
                 raw = raw + review_show_raw
@@ -563,6 +580,12 @@ end
                 tree_contentsT1 = search(tree_hash,tree_hashT2_respond)
                 tree_hashT1 = create_treeT1(tree_contentsT1)
                 message_respond= "Response to #{review_respond}"
+                author = `git log -1 --pretty=%an #{tree_hash}`
+		author_email = `git log -1 --pretty=%ae #{tree_hash}`
+		author_date = `git log -1 --pretty=%ad #{tree_hash}`
+		ENV['GIT_AUTHOR_NAME'] = author
+		ENV['GIT_AUTHOR_EMAIL'] = author_email
+		ENV['GIT_AUTHOR_DATE'] = author_date
                 command_respond= "git commit-tree #{tree_hashT1} -p review "
                 commit_tree(tree_hashT1,message_respond,command_respond)
                 exit                 
@@ -599,7 +622,7 @@ t="100644 blob #{review_hash}\t#{review_hash}"
     tree_hashT2A = create_treeT2(t)
     createT1A = "040000 tree #{tree_hashT2A}\t#{commit_hash}\n"
     tree_hashT1A= create_treeT1(createT1A)  
-    messageA = "This is the first review on any commit"
+    messageA = `git log -1 --pretty=%f #{commit_hash}`
     commandA = "git commit-tree #{tree_hashT1A}"
     commit_tree(tree_hashT1A,messageA,commandA)
 
@@ -612,7 +635,7 @@ t="100644 blob #{review_hash}\t#{review_hash}"
        tree_hashT2B = create_treeT2(t) 
        check_tree= check_tree + "040000 tree #{tree_hashT2B}\t#{commit_hash}"
        tree_hashT1B = create_treeT1(check_tree)
-       messageB = "This is the first review on this commit"
+       messageB = `git log -1 --pretty=%f #{commit_hash}`
        commandB = "git commit-tree #{tree_hashT1B} -p review"
        commit_tree(tree_hashT1B,messageB,commandB)
  
@@ -624,7 +647,8 @@ t="100644 blob #{review_hash}\t#{review_hash}"
     tree_hashT2C = create_treeT2(tree_contents)    
     tree_contentsT1C = search(commit_hash,tree_hashT2C)
     tree_hashT1C = create_treeT1(tree_contentsT1C)
-    messageC= "This commit has been reviewed before"
+    messageC= `git log -1 --pretty=%f #{commit_hash}`
+    messageC= "Re: #{messageC}" 
     commandC= "git commit-tree #{tree_hashT1C} -p review "
     commit_tree(tree_hashT1C,messageC,commandC)
       

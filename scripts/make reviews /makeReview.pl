@@ -58,7 +58,7 @@ for my $msg ($mb->get_messages) {
               print MYFILE "$body_str";
               close (MYFILE); 
               if ($from =~ /^[A-z]/ ) {
-              my $show =`git reviewmbox '$commitid' '$from' '$date' '$email'`;
+              my $show =`git reviewmbox '$commitid' '$from' '$date' '$email' '$subject'`;
               print $show;
               }
              
@@ -90,7 +90,7 @@ for my $msg ($mb->get_messages) {
                print MYFILE "$body_str";
                close (MYFILE);
                if ($from =~ /^[A-z]/ ) {   
-               my $response =`git reviewmbox '$commitid' '$from' '$date' '$email'`;
+               my $response =`git reviewmbox '$commitid' '$from' '$date' '$email' '$subject'`;
                print $response;
                }
               }

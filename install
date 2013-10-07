@@ -18,8 +18,8 @@ chown root:root /usr/local/bin/git-review-log-limit
 cp scripts/git-review-log-show /usr/local/bin/git-review-log-show
 chown root:root /usr/local/bin/git-review-log-show
 
-cp scripts/git-review-log-author /usr/local/bin/git-review-log-author
-chown root:root /usr/local/bin/git-review-log-author
+cp scripts/git-review-log-reviewer /usr/local/bin/git-review-log-reviewer
+chown root:root /usr/local/bin/git-review-log-reviewer
 
 cp scripts/git-reviewmbox /usr/local/bin/git-reviewmbox
 chown root:root /usr/local/bin/git-reviewmbox

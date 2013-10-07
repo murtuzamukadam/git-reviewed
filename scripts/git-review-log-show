@@ -10,7 +10,7 @@ if(length($commithash) != 0)
  } 
 
 
-my $rev = `git log --no-merges --numstat review`;
+my $rev = `git log --no-merges --numstat review --pretty=fuller`;
 open my $fh, '<', \$rev or die $!;
 
 while (<$fh>) {
@@ -22,14 +22,16 @@ while (<$fh>) {
  else {
   
           $log =  "$current\n";
-          my @authordetails = (split('\n', $log))[0..2];
-          my @values = (split('\t', $log))[2];
+          my @authordetails = (split('\n', $log))[0..4];
+           my @details = (split('\n', $log))[4..5];
+          my @values = (split('\n', $log))[7];
           foreach my $val1 (@values) {
-                my @values1 = (split('\/', $val1))[0];
-                $val1 = (split('\/', $log))[1];
+                 my $val = (split('\/', $val1))[0];
+                $val = (split('\t', $val))[2];
+                $val1 = (split('\/', $val1))[1];
+                
                 $val1 =~ s/^\s+//;
-	        $val1 =~ s/\s+$//; 
-		foreach my $val (@values1) {
+	        $val1 =~ s/\s+$//;
                    if($flag == 1 && $val ne $commithash) {
             
                       #do nothing
@@ -37,22 +39,37 @@ while (<$fh>) {
                   
                    else {
                       
-                    print "\n\n----------------------------------------------------------\nReview ";
+                    print "\nReview: ";
                     print "$val1\n";
                     
-                    print "commit Reviewed ";
+                    print "Commit Reviewed: ";
                     print "$val\n";
                       foreach(@authordetails){
+                         if($_ =~ /^Commit:\s\s(.*)/)
+                            {
+                                 my $reviewer = $1;
+                                 print "Reviewer:$reviewer\n";
+                            }
+                         elsif($_ =~ /^CommitDate:\s(.*)/)
+                            {
+                                 my $reviewdate = $1;
+                                 print "ReviewDate: $reviewdate\n";
+                            }
+                        else {
  			 print "$_\n";
+}
   		      }
+                    foreach(@details){
+  			print "$_\n";
+ 		      }
                      
                     my $get_tree = `git cat-file -p $val1`;
-                    print $get_tree;
+                    print "--\n$get_tree\n------------------------------------------------------------";
                    }
                  }
 
 
-             }
+             
      
 
 

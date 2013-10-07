@@ -1,14 +1,8 @@
 #!/usr/bin/perl
 
-my $commithash = $ARGV[0];
+my $author = $ARGV[0];
 my $flag = 0; 
 my $log = '';
-my $check = 0;
-if(length($commithash) != 0)
- {
-   $flag =1;
- } 
-
 
 
 
@@ -19,33 +13,48 @@ while (<$fh>) {
        if (/^(?!commit)/) {
           $current = $current.$_;
        }
- 
-       else {
+
+ else {
   
           $log =  "$current\n";
-         
+          
+          
+          
           my @authordetails = (split('\n', $log))[0..4];
-          
           my @details = (split('\n', $log))[4..5];
+          $removecheck = (split('Commit: ', $log))[1];
           
+          $removecheck = (split('\n', $removecheck))[0];
+           $removecheck =~ s/^\s+//;
+	        $removecheck =~ s/\s+$//;
+          $name = (split('\s', $removecheck))[0];
+          
+          $name = uc($name);
+          $lastname = (split('\s', $removecheck))[1];
+          $lastname = uc($lastname);
+          $fullname = $name.$lastname;
+       
+          if ($name eq $author || $lastname eq $author || $fullname eq $author) {
+    
+                $flag=1;
+          } 
+
+
+          else {
+               $flag=0;
+    
+          }       
           my @values = (split('\n', $log))[7];
-          
-                
-         
           foreach my $val1 (@values) {
-          
-                
-                my $val = (split('\/', $val1))[0];
+               my $val = (split('\/', $val1))[0];
                 $val = (split('\t', $val))[2];
                 $val1 = (split('\/', $val1))[1];
                 
                 $val1 =~ s/^\s+//;
 	        $val1 =~ s/\s+$//;
-                
-		
-                   if($flag == 1 && $val ne $commithash) {
+                   if($flag != 1) {
             
-                        #do nothing
+                      #do nothing
                    }
                   
                    else {
@@ -55,7 +64,7 @@ while (<$fh>) {
 	              print "Commit Reviewed: ";
                       print "$val\n";
                       foreach(@authordetails){
- 			 if($_ =~ /^Commit:\s\s(.*)/)
+ 			  if($_ =~ /^Commit:\s\s(.*)/)
                             {
                                  my $reviewer = $1;
                                  print "Reviewer:$reviewer\n";
@@ -71,13 +80,13 @@ while (<$fh>) {
   		      }
   		      }
                       foreach(@details){
-  			print "$_\n";
+  			 print "$_\n";
  		      }
                    }
-                 
+                 }
 
 
-             }
+             
      
 
 
@@ -85,4 +94,5 @@ while (<$fh>) {
        }
 }
 close $fh or die $!;
+
 
