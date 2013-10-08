@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 #!bin/sh
 
+require "open3"
 
 review_hash=ARGV[0]
 value = 1;
@@ -12,46 +13,47 @@ check = rev[0]
 if value == 1 and check =~ /^From/
               
          $value = 0;
-         format_linux = show
+        format_linux = show
          subject = rev[3]
-         subject = subject.split(/Subject:/)
-         path = `pwd`
+        subject = subject.split(/Subject:/)
+        subject[1].tr!("/", "-")
+        
+        path = `pwd`
          path = path.strip
-         File.open("#{path}/#{subject}.patch", 'w') { |file| file.write(format_linux) }
-         %x{gvim #{"#{path}/#{review_hash}.patch"}}
+        File.open("#{path}/#{subject}.patch", 'w') { |file| file.write(format_linux) }
+         
            
 
              
 else 
-    
-        show1= `git review --show-raw #{review_hash}`
-        from = show.split(/\n/)
-        from =from[1].split(/:/)
-        format = "From: " + from[1] +"\n"
-	format= format + "Subject: " + "[PATCH] " + "\n"
-	time1 = Time.new
-	date = "Date: " + time1.inspect
-	format= format + date + "\n\n---\n"
-	find = `git review-log`
-	find = find.split("\n").map {|row| row.split()}
-	matched_rowindex=find.find_index {|row| row[1]==review_hash}
-	matched_rowindex=matched_rowindex + 2
-	commit = find[matched_rowindex][1]
-	stat = `git log --stat -1 #{commit}`
-	stat= stat.split(/\n/)
-	length = stat.length
-	stat = stat[6..length]
-	stat = stat.join("\n") 
-	format = format + stat + "\n"
+        checkcontents = `git log --numstat review | grep /#{review_hash}`
+  	checkcontents= checkcontents.split(/\//)[0]
+        checkcontents= checkcontents.split(/\t/)[2]
+        commithash=checkcontents.strip
+        stdin, stdout, stderr = Open3.popen3("git log -1 review  --pretty=fuller -- #{commithash}/#{review_hash}")
+        reviewer_details = stdout.read()
+        error = stderr.read() 
+        reviewer_details = reviewer_details.split(/\n/)
+        reviewer = reviewer_details[3]
+         reviewer = reviewer.split("Commit:\s")[1]
+         reviewer = reviewer.strip
+         review_date = reviewer_details[4]
+        review_date = review_date.split("CommitDate:\s")[1]
+        review_date = review_date.strip
+        subject=reviewer_details[6].strip
+        format = "From: " + reviewer +"\n"
+	format= format + "Subject: " + "[PATCH] #{subject}" + "\n"
+	format= format + "Date: " + review_date + "\n\n---\n"
 	body = show.split(/commit\s\w{40}/)
-	format = format + body[1] + "\n--\n"
+	format = format + show + "\n--\n"
 	path = `pwd`
 	path = path.strip
 	version = `git version`
 	version= version.split(/git version/)
 	format = format + version[1]
-	File.open("#{path}/#{review_hash}.patch", 'w') { |file| file.write(format) }
-	%x{gvim #{"#{path}/#{review_hash}.patch"}}
+        puts format
+	File.open("#{path}/#{subject}.patch", 'w') { |file| file.write(format) }
+	
 end
 
 

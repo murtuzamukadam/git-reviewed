@@ -77,6 +77,13 @@ def delete(tree_hash,review_del)
                 tree_hashT2 = create_treeT2(checkreviewcontents)    
                 tree_contentsT1 = search(tree_hash,tree_hashT2)
                 tree_hashT1 = create_treeT1(tree_contentsT1)
+                author = `git log -1 --pretty=%an #{tree_hash}`
+		author_email = `git log -1 --pretty=%ae #{tree_hash}`
+		author_date = `git log -1 --pretty=%ad #{tree_hash}`
+		ENV['GIT_AUTHOR_NAME'] = author
+		ENV['GIT_AUTHOR_EMAIL'] = author_email
+		ENV['GIT_AUTHOR_DATE'] = author_date
+                
                 message= "Review #{review_del} has been deleted"
                 command= "git commit-tree #{tree_hashT1} -p review "
                 commit_tree(tree_hashT1,message,command)
@@ -448,12 +455,13 @@ end
                            commitid=commitid[1].split("/")
                            commit = commitid[0]
                            reviewid = commitid[1]
-                           list_review = `git log --numstat review |grep -B 5 /#{reviewid}`
+                           list_review = `git log --numstat review --pretty=fuller |grep -B 5 /#{reviewid}`
                            list_review = list_review.split(/\n/)[0]
                            if list_review.length==0
                               next
                            end
-                           author = list_review.split("Author: ")[1]
+                           author = list_review.split("Commit: ")[1]
+                           author = author.strip
                            author=author.split(/\n/)[0]
                            name = author.split(/\s/)[0]
                            name = name.upcase
@@ -615,7 +623,12 @@ check_tree = stdout.read()
 error = stderr.read()
 
 t="100644 blob #{review_hash}\t#{review_hash}"
-
+author = `git log -1 --pretty=%an #{commit_hash}`
+author_email = `git log -1 --pretty=%ae #{commit_hash}`
+author_date = `git log -1 --pretty=%ad #{commit_hash}`
+ENV['GIT_AUTHOR_NAME'] = author
+ENV['GIT_AUTHOR_EMAIL'] = author_email
+ENV['GIT_AUTHOR_DATE'] = author_date
 #A - making a review for the first time
 
  if check_tree.length==0
@@ -636,6 +649,7 @@ t="100644 blob #{review_hash}\t#{review_hash}"
        check_tree= check_tree + "040000 tree #{tree_hashT2B}\t#{commit_hash}"
        tree_hashT1B = create_treeT1(check_tree)
        messageB = `git log -1 --pretty=%f #{commit_hash}`
+       
        commandB = "git commit-tree #{tree_hashT1B} -p review"
        commit_tree(tree_hashT1B,messageB,commandB)
  
