@@ -1,0 +1,41 @@
+#!/bin/bash
+
+echo "Enter the month for which reviews need to be updated Eg: 02,03"
+read month
+echo "Enter the year for which reviews need to be updated Eg 2012,2013"
+read year
+path=`pwd`
+
+echo "Enter mbox Location Path"
+read path1
+#echo path 
+#git log
+#pushd $path && git log -p --after={$year-$month-01} --before={$year-$month-31} < /tmp/linuxhistory.in; popd
+echo "Updating...This may take a few minutes"
+git log -p --after={$year-$month-01} --before={$year-$month-31} | sudo /usr/local/bin/parsePatches.pl > /tmp/linuxhistory.in
+
+rm -f -r /tmp/lineslinus.db
+sqlite3 /tmp/lineslinus.db "CREATE TABLE line(cid char(40), filename varchar(140), linetype char, line text);"
+
+echo -e '.separator ";"\n.import /tmp/linuxhistory.in line' | sqlite3  /tmp/lineslinus.db
+
+sqlite3 /tmp/lineslinus.db "CREATE INDEX lineidx on line(line, linetype, filename);"
+sqlite3 /tmp/lineslinus.db "CREATE INDEX lineidx2 on line(cid);"
+
+
+
+sudo cat "$path1" | /tmp/searchMatch.pl > /tmp/mailmatch.out
+
+sudo cp /usr/local/bin/msg_to_commit.pl "$path"/msg_to_commit.pl
+#sudo 
+
+sudo msg_to_commit.pl "$path1"
+rm -f -r msg_to_commit.pl
+
+
+
+
+#echo "Enter the location of the mbox file"
+#read mbox
+#cat "$mbox" | ./searchMatch.pl > /tmp/printresult.txt
+#perl msg_to_commit.pl "$mbox"

@@ -3,8 +3,9 @@ use Mail::MboxParser;
 #cat 2012-07 | ./searchMatch.pl | ./msg_to_commit.pl
 use strict;
 
+open (MYFILE, '/tmp/mailmatch.out');
 my @input;
-while(my $line = <>) {
+while(my $line = <MYFILE>) {
 	push @input, $line;
 }
 
@@ -28,7 +29,7 @@ while (@input) {
         cache_file_name => 'mail/cache-file',
      };
 #foreach my $arg(@ARGV){
-my $mb = Mail::MboxParser->new('/home/murtuza/linux-review-miller/2008-02',
+my $mb = Mail::MboxParser->new($ARGV[0],
                                     decode     => 'ALL',
                                     parseropts => $parseropts);
 for my $msg ($mb->get_messages) {
@@ -48,7 +49,7 @@ for my $msg ($mb->get_messages) {
        #my $row = $sth->fetchrow_arrayref();
          
        if ($msgid eq $thisid) {
-              print "$msgid -----------------> $thisid\n";
+              #print "$msgid -----------------> $thisid\n";
               #my ($tid, $commitid) = @$row;
               open (MYFILE, '> /tmp/data.tmp');
               print  MYFILE "From : $from\n";
@@ -88,7 +89,7 @@ elsif ( $referenceid =~ /<(.*?)>/ ){
              #$sth->execute;
              #my $row = $sth->fetchrow_arrayref();       
               if ($msgid eq $reference) {
-                print "$msgid -----------------> $reference\n";
+                #print "$msgid -----------------> $reference\n";
               #  my ($tid, $commitid) = @$row;
                 open (MYFILE, '> /tmp/data.tmp');
                 print MYFILE "From : $from\n";

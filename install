@@ -30,6 +30,17 @@ chown root:root /usr/local/bin/git-display
 cp scripts/git-displaygui /usr/local/bin/git-displaygui
 chown root:root /usr/local/bin/git-displaygui
 
+cp scripts/patch-commit-linker/parsePatches.pl /usr/local/bin/parsePatches.pl
+chown root:root /usr/local/bin/parsePatches.pl
+
+cp scripts/patch-commit-linker/searchMatch.pl /tmp/searchMatch.pl
+
+cp scripts/msg_to_commit.pl /usr/local/bin/msg_to_commit.pl
+chown root:root /usr/local/bin/msg_to_commit.pl
+
+cp scripts/git-update-review /usr/local/bin/git-update-review
+chown root:root /usr/local/bin/git-update-review
+
 mkdir -p /usr/local/share/man/man1
 gzip -c doc/git-review.1 > /usr/local/share/man/man1/git-review.1.gz
 chown root:root /usr/local/share/man/man1/git-review.1.gz
