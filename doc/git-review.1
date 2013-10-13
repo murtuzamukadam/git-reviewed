@@ -141,34 +141,17 @@ $ git review --log
 .br
 Review b88a0c3b2c8a5924acefdb99fb50bff3a2dfe7ff
 .br
-commit Reviewed 02f8efec7e50c925924bbe3a6160de0a82e8b724
-.br
-Response to 921b762aad203dca6e265b2658c7c3c0566c702a
-.br
-commit 3172364ddc0eafdcdf88275e4c56867fd748a8c4
+Commit Reviewed 02f8efec7e50c925924bbe3a6160de0a82e8b724
 .br
 Author: Murtuza Mukadam 
 .br
-Date:   Fri Jun 21 23:50:50 2013 -0400
-.P
-$ git review --log-show
-.P
-...shows the log history of the reviews made along with the review content
+AuthorDate:   Fri Jun 21 23:50:50 2013 -0400
 .br
-Review dc0a9fbf5030a824e29657618d5184749aaaf422
-.P
-content
-.P
-commit Reviewed 02f8efec7e50c925924bbe3a6160de0a82e8b724
+Reviewer:   Murtuza Mukadam <murtuza16289@gmail.com>
 .br
-commit 3addb240fc1ed0fce6f1fc72915d6575fcbfe475
+ReviewDate: Sat Oct 12 20:27:29 2013 -0400
 .br
-Author: Murtuza Mukadam 
-.br
-Date:   Fri Jun 21 23:33:03 2013 -0400
-
 .P
-
 $ git review --amend 
 .P
 ... allows to make a change to the review
@@ -177,8 +160,6 @@ Amending Review Object
 .br
 838a2d22de4d0bb393f2874bc92734a073757fea
 .P
-
-
 $ git review --show-raw review-hash
 .P
 ... shows the raw content of the review object
@@ -187,13 +168,10 @@ Commit Reviewed: 02f8efec7e50c925924bbe3a6160de0a82e8b724
 .br
 Reviewer: Murtuza Mukadam 
 .br
-Date:   Wed Jun 19 18:40:38 2013 -0400
+Review Date:   Wed Jun 19 18:40:38 2013 -0400
 .P
 content
-
 .P
-
-
 $ git review --respond review-hash
 .P
 ... allows reviewer to respond to a review
@@ -201,81 +179,20 @@ $ git review --respond review-hash
 Creating Response Review Object
 .br
 b3a3becba4b947a381c53a8444ac239b57acd6b0
-
-.P
-
-
-$ git review --format review-hash
-.P
-... prepares the review for an email submission
-.br
-.br
-From:  Murtuza Mukadam 
-.br
-Subject: [PATCH] 
-.br
-Date:   Fri Jun 21 23:50:50 2013 -0400
-.br
----
-.br
- .../b88a0c3b2c8a5924acefdb99fb50bff3a2dfe7ff       | 62 ++++++++++++++++++++++
-.br
- 1 file changed, 62 insertions(+)
-.br
-
->>Author: Murtuza Mukadam 
-.br
->>Date:   Fri May 31 22:31:38 2013 -0400
-.br
->>
-.br
->>    This is my second commit
-.br
->>
-.br
->>diff --git a/git-review.txt b/git-review.txt
-.br
->>new file mode 100644
-.br
->>index 0000000..5695fd9
-.br
->>--- /dev/null
-.br
->>+++ b/git-review.txt
-.br
->>@@ -0,0 +1,48 @@
-.br
->>+#!/usr/bin/env ruby
-.br
-
->>+value = `git diff`
-.br
---
- 
-.br
-1.8.1.msysgit.
-.
 .P
 $ git review --list 
 .P
 ... lists all the reviews present on the review branch.
 .br
+Total Number of Reviews: 152
+.P
 Review: 188aa11a5c2dbeaec05491a73f94ba931248db65
 .br
 Commit Reviewed: add7ad68fe46a9a71bbcfb348f75dfa85f758163
-.br
-Reviewer: Tavish Armstrong <tavisharmstrong@gmail.com>
-.br
-Date:   Thu Aug 22 12:24:00 2013 -0400
 .P
 Review: 2f538aa6cdf4d53ffb7846dbcfd5020ce7aad8bf
 .br
 Commit Reviewed: add7ad68fe46a9a71bbcfb348f75dfa85f758163
-.br
-Reviewer: Murtuza Mukadam <murtuza16289@gmail.com>
-.br
-Date:   Thu Aug 22 12:17:33 2013 -0400
-.br
 .P
 .SH "AUTHOR"
 .br
