@@ -190,7 +190,8 @@ end
            elsif opts[:log]==true
                 
                 if ARGV.length ==0
-		    review_log=`git review-log` 
+                    stdin, stdout, stderr = Open3.popen3("git review-log")
+       		    review_log=stdout.read() 
                     begin
                     IO.popen("less", "w") { |f| f.puts review_log}                  
                     rescue Errno::EPIPE
