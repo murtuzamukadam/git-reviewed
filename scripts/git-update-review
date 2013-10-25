@@ -1,5 +1,10 @@
 #!/bin/bash
 
+file="/tmp/searchMatch.pl"   
+if [ -e "$file" ]
+then
+
+
 echo "Enter the month for which reviews need to be updated Eg: 02,03"
 read month
 echo "Enter the year for which reviews need to be updated Eg 2012,2013"
@@ -23,7 +28,6 @@ sqlite3 /tmp/lineslinus.db "CREATE INDEX lineidx on line(line, linetype, filenam
 sqlite3 /tmp/lineslinus.db "CREATE INDEX lineidx2 on line(cid);"
 
 
-
 sudo cat "$path1" | /tmp/searchMatch.pl > /tmp/mailmatch.out
 
 sudo cp /usr/local/bin/msg_to_commit.pl "$path"/msg_to_commit.pl
@@ -32,7 +36,10 @@ sudo cp /usr/local/bin/msg_to_commit.pl "$path"/msg_to_commit.pl
 sudo msg_to_commit.pl "$path1"
 rm -f -r msg_to_commit.pl
 
+else 
+echo "Please re-install git-review by following the installation steps before updating"
 
+fi
 
 
 #echo "Enter the location of the mbox file"

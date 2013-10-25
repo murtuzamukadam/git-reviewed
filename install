@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 cp scripts/git-review /usr/local/bin/git-review
 chown root:root /usr/local/bin/git-review
 
