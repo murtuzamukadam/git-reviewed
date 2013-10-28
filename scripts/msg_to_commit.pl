@@ -74,6 +74,8 @@ for my $msg ($mb->get_messages) {
               print MYFILE "$body_str";
               close (MYFILE); 
               $subject =~ tr/'/-/;
+              $subject =~ tr/"/-/;
+               $subject =~ tr/:/-/;
               if ($from =~ /^[A-z]/  ) {
               my $show =`git reviewmbox '$commitid' '$from' '$date' '$email' '$subject'`;
               print $show;
@@ -108,6 +110,8 @@ elsif ( $referenceid =~ /<(.*?)>/ ){
                print MYFILE "$body_str";
                close (MYFILE);
                 $subject =~ tr/'/-/;
+                $subject =~ tr/"/-/;
+               $subject =~ tr/:/-/;
                if ($from =~ /^[A-z]/ ) {   
                my $response =`git reviewmbox '$commitid' '$from' '$date' '$email' '$subject'`;
                print $response;

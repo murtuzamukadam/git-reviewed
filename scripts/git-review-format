@@ -20,7 +20,7 @@ if value == 1 and check =~ /^From/
         
         path = `pwd`
          path = path.strip
-        File.open("#{path}/#{subject}.patch", 'w') { |file| file.write(format_linux) }
+        File.open("#{path}/[REVIEW]#{subject}.patch", 'w') { |file| file.write(format_linux) }
          
            
 
@@ -51,8 +51,11 @@ else
 	version = `git version`
 	version= version.split(/git version/)
 	format = format + version[1]
-        puts format
-	File.open("#{path}/#{subject}.patch", 'w') { |file| file.write(format) }
+      
+  File.open("#{path}/[REVIEW]#{subject}.patch", 'w') { |file| file.write(format) }
+       
+        
+  
 	
 end
 

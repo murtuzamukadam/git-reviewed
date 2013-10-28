@@ -8,7 +8,7 @@ include Open3
 def make_review(value)
 	
 	File.open('/tmp/review.tmp', 'w') { |file| file.write(value) }
-	%x{gvim #{'/tmp/review.tmp'}}
+	%x{xdg-open #{'/tmp/review.tmp'}}
 	create_review = "git hash-object -w /tmp/review.tmp"
 	review_hash = `#{create_review}`
 	review_hash = review_hash.strip
