@@ -15,4 +15,3 @@ To have git-review installed on your machine:
 **trollop command line option parser for ruby: gem install trollop
 **Open3 to grant access to stdin, stdout, stderr 
 
-*git-review uses a standard text editor gvim : sudo apt-get install vim-gnome
