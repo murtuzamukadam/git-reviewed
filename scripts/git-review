@@ -7,9 +7,9 @@ include Open3
 
 def make_review(value)
 	
-	File.open('/tmp/review.tmp', 'w') { |file| file.write(value) }
-	%x{xdg-open #{'/tmp/review.tmp'}}
-	create_review = "git hash-object -w /tmp/review.tmp"
+	File.open('/tmp/review.txt', 'w') { |file| file.write(value) }
+	%x{gvim #{'/tmp/review.txt'}}
+	create_review = "git hash-object -w /tmp/review.txt"
 	review_hash = `#{create_review}`
 	review_hash = review_hash.strip
 	puts "Creating Review Object"
@@ -152,6 +152,15 @@ end
               
           elsif opts[:amend] ==true               
 		
+
+                 stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
 		review_log = `git review-log`
 		review_log = review_log.split(/\n/)[1]
 		review_hash = review_log.split[1]                        
@@ -188,7 +197,14 @@ end
 		exit
 
            elsif opts[:log]==true
-                
+                 stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
                 if ARGV.length ==0
                     stdin, stdout, stderr = Open3.popen3("git review-log")
        		    review_log=stdout.read() 
@@ -223,11 +239,19 @@ end
                 exit
 
              elsif opts[:log_limit]==true
-          
+                  stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
 		 if ARGV.length ==0
 		   puts "--log-limit requires an argument. Check git review --help"
                    exit
                  else 
+                     
                     review_log_limit =`git review-log-limit #{ARGV[0]}` 
                     begin
                       IO.popen("less", "w") { |f| f.puts review_log_limit}                  
@@ -238,7 +262,14 @@ end
                  exit
             
              elsif opts[:log_reviewer]==true
-                
+                 stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
                 if ARGV.length ==0
                    puts " --log-reviewer needs a reviewer name. Check git review --help"
                    exit               
@@ -267,7 +298,14 @@ end
 
    
           elsif opts[:format]==true
-              
+                 stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
                 if ARGV.length ==0
                    puts " --format needs a review hash. Check git review --help"
                    exit
@@ -287,7 +325,14 @@ end
 		
                
             elsif opts[:log_show]==true
-                
+                stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
                  if ARGV.length ==0
 		    review_log_show =`git review-log-show`
                     begin
@@ -321,7 +366,14 @@ end
                 exit 
            
             elsif opts[:display]==true
-              
+                stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
                 if ARGV.length ==0
                    puts " --display needs a review hash. Check git review --help"
                    exit
@@ -340,7 +392,14 @@ end
                 exit 
 
             elsif opts[:rm]==true
-                                  
+                 stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end           
                 if ARGV.length ==0
                    puts " --display needs a review hash. Check git review --help"
                    exit
@@ -380,9 +439,18 @@ end
                 exit
   
              elsif opts[:list]==true
-             
+                
                 if ARGV.length ==0
-                   check_list = `git ls-tree review -r`
+                   
+                   stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
+                check_list = `git ls-tree review -r`
                    check_list =  check_list.split(/\n/)
                    l = check_list.length
                    list="Total Number of Reviews: #{l}\n"
@@ -402,6 +470,14 @@ end
                    exit
                 end
                 commit_hash = ARGV[0]
+                stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
                 check= `git cat-file -t #{commit_hash}`
                 check=check.strip
                 if check != "commit"
@@ -433,7 +509,14 @@ end
              
               
              elsif opts[:filter_reviewer]==true
-             
+                stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
                 if ARGV.length ==0
                    puts " --filter-reviewer needs a reviewer name. Check git review --help"
                    exit               
@@ -482,13 +565,28 @@ end
                 
 
              elsif opts[:show_raw]==true
-            
+                stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
                 if ARGV.length ==0
                    puts " --show-raw needs a review hash. Check git review --help"
                    exit
                 end
                 review_raw = ARGV[0]
-                check= `git cat-file -t #{review_raw}`
+                stdin, stdout, stderr = Open3.popen3("git cat-file -t #{review_raw}")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "error: unable to find #{review_raw}"
+                   
+                    exit
+                 end
+                check= stdout.read()
                 check=check.strip
                 if check != "blob"
                    puts "--show-raw needs a review hash. Check git review --help"
@@ -552,7 +650,14 @@ end
                 exit
 
             elsif opts[:respond]==true
-              
+                 stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
 		 if ARGV.length ==0
                     puts " --respond needs a review hash. Check git review --help"
                     exit
