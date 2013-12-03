@@ -6,9 +6,19 @@ include Open3
 
 
 def make_review_mbox
-	stdin, stdout, stderr = Open3.popen3("git hash-object -w /tmp/data.tmp")
-        review_hash = stdout.read().strip
-        error = stderr.read()
+        create_review= `git hash-object /tmp/data.tmp`
+         create_review = create_review.strip
+          stdin, stdout, stderr = Open3.popen3("git cat-file -t #{create_review}")
+          object=stdout.read().strip
+
+        if(object.length!=0)
+           puts "fatal:trying to create a duplicate review"
+          exit
+        end
+
+	stdin1, stdout1, stderr1 = Open3.popen3("git hash-object -w /tmp/data.tmp")
+        review_hash = stdout1.read().strip
+        error = stderr1.read()
   
         if error.length !=0
           exit
@@ -90,9 +100,7 @@ ENV['GIT_AUTHOR_DATE'] = author_date
 stdin, stdout, stderr = Open3.popen3("git ls-tree review")
 check_tree = stdout.read()
 error = stderr.read()
-if review_hash == "2fe4a4bc65696389334ae07ead241c8ff0d36597" || review_hash== "4eebc6749a67517ce788fd864c38222a7144b841" || review_hash == "bab091a6154df0ccd9570709ac4665bc9e9e7a9a" || review_hash == "701e9f17e77cb2237d9998f7f8b9eef4a4fdb4ac"
-exit
-end
+
 t="100644 blob #{review_hash}\t#{review_hash}"
 
 

@@ -8,8 +8,16 @@ include Open3
 def make_review(value)
 	
 	File.open('/tmp/review.txt', 'w') { |file| file.write(value) }
-	%x{gvim #{'/tmp/review.txt'}}
-	create_review = "git hash-object -w /tmp/review.txt"
+      	%x{gvim #{'/tmp/review.txt'}}
+	create_review = `git hash-object /tmp/review.txt`
+        create_review = create_review.strip
+        stdin, stdout, stderr = Open3.popen3("git cat-file -t #{create_review}")
+        object=stdout.read().strip
+        if(object.length!=0)
+           puts "fatal:trying to create a duplicate review"
+          exit
+        end
+        create_review = "git hash-object -w /tmp/review.txt"        
 	review_hash = `#{create_review}`
 	review_hash = review_hash.strip
 	puts "Creating Review Object"
