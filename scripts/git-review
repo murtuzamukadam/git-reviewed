@@ -121,7 +121,8 @@ EOS
   opt :display, "Displays the review along with interleaved history"
   opt :rm, "Deletes the review"
   opt :list, "View list of reviews for a particular commit"
-  opt :filter_reviewer, "Deletes all reviews except the committer specified"
+  opt :filter_reviewer, "Deletes all reviews except the reviewer specified"
+  opt :delete_before, "Deletes all reviews before the date given"
 end
           if opts[:init] ==true
                
@@ -571,6 +572,44 @@ end
                     end
                 exit
                 
+
+             elsif opts[:delete_before]
+
+		stdin, stdout, stderr = Open3.popen3("git show-branch review")
+                   
+                   error = stderr.read()
+                   if error.length!=0  
+                   puts "fatal: Not a valid object name review"
+
+                    exit
+                end
+                
+		if ARGV.length ==0
+                   puts " --delete-before needs a reviewer name. Check git review --help"
+                   exit               
+		end 
+                date = ARGV[0]
+		check_list = `git ls-tree review -r`
+                check_list =  check_list.split(/\n/)
+                l = check_list.length
+                list=""
+                check_list.each do |commitid|
+                           commitid=commitid.split(/\t/)
+                           commitid=commitid[1].split("/")
+                           commit = commitid[0]
+                           reviewid = commitid[1]
+                           list_review = `git log --numstat review --pretty=fuller --before=#{date} |grep -B 5 /#{reviewid}`
+                           
+                           if list_review.length==0
+                              next
+                           end
+                           
+                           reviewdel =  `git review --rm "#{reviewid}" `
+                           puts reviewdel  
+                             
+                           end
+                    
+                exit
 
              elsif opts[:show_raw]==true
                 stdin, stdout, stderr = Open3.popen3("git show-branch review")
