@@ -38,7 +38,11 @@ while (<$fh>) {
                    }
                   
                    else {
-                      
+                    #   if($message =~ /has been deleted/)
+               		#{
+                    		#do nothing
+               		#}
+                      #else { 
                     print "\nReview: ";
                     print "$val1\n";
                     
@@ -63,12 +67,12 @@ while (<$fh>) {
   			print "$_\n";
  		      }
                      
-                    my $get_tree = `git cat-file -p $val1`;
+                    my $get_tree = `git show $val1`;
                     print "--\n$get_tree\n------------------------------------------------------------";
                    }
                  }
 
-
+              #}
              
      
 

@@ -1,5 +1,12 @@
 #!/bin/bash
 
+apt-get install libtcltk-ruby
+apt-get install libtrollop-ruby
+apt-get install vim-gnome
+
+
+
+
 cp scripts/git-review /usr/local/bin/git-review
 chown root /usr/local/bin/git-review
 
@@ -43,3 +50,5 @@ chown root /usr/local/bin/git-update-review
 mkdir -p /usr/local/share/man/man1
 gzip -c doc/git-review.1 > /usr/local/share/man/man1/git-review.1.gz
 chown root:root /usr/local/share/man/man1/git-review.1.gz
+
+echo -e "git-review installed successfully"

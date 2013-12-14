@@ -16,6 +16,7 @@ while (<$fh>) {
           my @authordetails = (split('\n', $log))[0..4];
           my @details = (split('\n', $log))[4..5];
           my @values = (split('\n', $log))[7];
+          #my $message = (split('\n', $log))[5];
           foreach my $val1 (@values) {
                 my $val = (split('\/', $val1))[0];
                 $val = (split('\t', $val))[2];
@@ -23,7 +24,11 @@ while (<$fh>) {
                 $val1 =~ s/^\s+//;
 	        $val1 =~ s/\s+$//; 
 		
-                  
+           #       if($message =~ /has been deleted/)
+            #   		{
+                    		#do nothing
+             #  		}
+              #        else {   
                       
                       print "\nReview: ";
        		      print "$val1\n";
@@ -53,7 +58,7 @@ while (<$fh>) {
 
 
              }
-     
+          # }
 
 
         $current = '';

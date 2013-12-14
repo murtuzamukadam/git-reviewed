@@ -30,7 +30,11 @@ while (<$fh>) {
           
           my @values = (split('\n', $log))[7];
           
-                
+          my $message = (split('\n', $log))[5];
+
+         
+         
+         
          
           foreach my $val1 (@values) {
           
@@ -47,9 +51,16 @@ while (<$fh>) {
             
                         #do nothing
                    }
-                  
+                    
+                   
+
                    else {
-                      
+                       
+                       #if($message =~ /has been deleted/)
+               		#{
+                    		#do nothing
+               		#}
+                      #else {    
                       print "\nReview: ";
        		      print "$val1\n";
 	              print "Commit Reviewed: ";
@@ -71,13 +82,13 @@ while (<$fh>) {
   		      }
   		      }
                       foreach(@details){
-  			print "$_\n";
+  			 print "$_\n";
  		      }
                    }
-                 
+                 }
 
 
-             }
+             #}
      
 
 

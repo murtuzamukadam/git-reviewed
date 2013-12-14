@@ -22,6 +22,12 @@ Allows the user to make a review on a given commit hash\.
 Initializes git-review inorder to start reviewing.
 .
 .P
+\fB--re-init\fR
+.
+.P
+Re-initializes git-review incase of an error.
+.
+.P
 \fB--pull\fR
 .
 .P
@@ -94,7 +100,7 @@ Deletes all the reviews on the review branch except the reviews made by the revi
 Allows reviewer to make any change to the last review.
 .
 .P
-\fB--show-raw\fR \fIreview-hash\fR
+\fB--view\fR \fIreview-hash\fR
 .
 .P
 Shows the contents of the review object.
@@ -172,7 +178,7 @@ Amending Review Object
 .br
 838a2d22de4d0bb393f2874bc92734a073757fea
 .P
-$ git review --show-raw review-hash
+$ git review --view review-hash
 .P
 ... shows the raw content of the review object
 .br

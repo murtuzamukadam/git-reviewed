@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'rubygems'
+
 require "trollop"
 require "open3"
 require 'tempfile'
@@ -113,7 +113,7 @@ EOS
   opt :log_reviewer, "Displays log history of all reviews made by a particular reviewer" 
   opt :log_limit, "Displays log history of all reviews limiting it to a certain value"
   opt :respond, "Respond to a review"
-  opt :show_raw, "Display raw review contents"
+  opt :view, "Display raw review contents"
   opt :log_show, "Displays the log history for all reviews along with the raw content"
   opt :format, "Prepare reviews for email submissions"
   opt :push, "Updates remote repositories by adding reviews"
@@ -124,6 +124,7 @@ EOS
   opt :filter_reviewer, "Deletes all reviews except the reviewer specified"
   opt :rm_before, "Deletes all reviews before the date given"
   opt :rm_after, "Deletes all reviews after the date given"
+  opt :re_init, " Re-initializing git-review"  
 end
           if opts[:init] ==true
                
@@ -137,7 +138,19 @@ end
                end
                puts "git-review ready to use"
                exit
-          
+         elsif opts[:re_init] ==true
+                
+		puts "WARNING: All unsaved reviews will be lost. Do you want to continue? [Y/N]"
+                answer=gets.strip
+                
+                if answer=="YES"||answer=="y"||answer=="Yes"||answer=="Y" 
+                     puts "git-review ready to use"
+                       `git branch -D origin/review`
+                        `git review --init`
+                         `git review --pull`
+                           puts "git-review ready to use"
+                    end 
+                    exit   
          elsif opts[:push] ==true  
               
                `git push origin review:review`
@@ -184,7 +197,7 @@ end
                   exit
                 end
                 if(!tree_hash)
-		  get_tree = `git review --show-raw #{review_del}`
+		  get_tree = `git review --view #{review_del}`
                   tree_hash= get_tree.lines.first
                   tree_hash= tree_hash.split[2]
                 end                                                   #Alternative incase above fails to Get the tree the review belongs to
@@ -350,8 +363,10 @@ end
                     rescue Errno::EPIPE
                       #do nothing
                     end
+                   
                     exit
                  end 
+
                 commit_hash = ARGV[0]
                 check= `git cat-file -t #{commit_hash}`
                 check=check.strip
@@ -402,6 +417,8 @@ end
                 exit 
 
             elsif opts[:rm]==true
+
+                 
                  stdin, stdout, stderr = Open3.popen3("git show-branch review")
                    
                    error = stderr.read()
@@ -519,6 +536,7 @@ end
              
               
              elsif opts[:filter_reviewer]==true
+                
                 stdin, stdout, stderr = Open3.popen3("git show-branch review")
                    
                    error = stderr.read()
@@ -571,6 +589,8 @@ end
                              
                            end
                     end
+         
+               
                 exit
                 
 
@@ -652,7 +672,7 @@ end
 
 
 
-             elsif opts[:show_raw]==true
+             elsif opts[:view]==true
                 stdin, stdout, stderr = Open3.popen3("git show-branch review")
                    
                    error = stderr.read()
@@ -662,7 +682,7 @@ end
                     exit
                 end
                 if ARGV.length ==0
-                   puts " --show-raw needs a review hash. Check git review --help"
+                   puts " --view needs a review hash. Check git review --help"
                    exit
                 end
                 review_raw = ARGV[0]
@@ -677,7 +697,7 @@ end
                 check= stdout.read()
                 check=check.strip
                 if check != "blob"
-                   puts "--show-raw needs a review hash. Check git review --help"
+                   puts "--view needs a review hash. Check git review --help"
                    exit
                 end
                 review_raw = `git rev-parse #{review_raw}`
@@ -769,7 +789,7 @@ end
                   exit
                 end
                 if(!tree_hash)
-		  get_tree = `git review --show-raw #{review_del}`
+		  get_tree = `git review --view #{review_del}`
                   tree_hash= get_tree.lines.first
                   tree_hash= tree_hash.split[2]
                 end 
