@@ -56,11 +56,11 @@ while (<$fh>) {
 
                    else {
                        
-                       #if($message =~ /has been deleted/)
-               		#{
+                       if($message =~ /has been deleted/)
+               		{
                     		#do nothing
-               		#}
-                      #else {    
+               		}
+                      else {    
                       print "\nReview: ";
        		      print "$val1\n";
 	              print "Commit Reviewed: ";
@@ -88,7 +88,7 @@ while (<$fh>) {
                  }
 
 
-             #}
+             }
      
 
 

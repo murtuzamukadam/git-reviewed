@@ -1,0 +1,23 @@
+Creating Reviews From mbox Files
+
+*Run cat mailmatch.out | perl createDb.pl > table.in inorder to create a file which stores the mid and the corresponding commitid. 
+
+*Create a db (data.db) to store in the mid and commitid 
+sqlite3 data.db
+CREATE TABLE line(tid varchar(256), commitid char(40));
+.separator ';'
+.import table.in line
+
+
+* Run perl separate.pl 2012-07 inorder to include all commits in which particular reviewer took part in
+
+sqlite3 check.db
+CREATE TABLE line(commitid char(40));
+.separator ';'
+.import commits.in line
+delete from line where commitid='not match';
+
+
+
+** Run perl makeReview.pl 2012-07 inorder to make reviews for 07-2012
+

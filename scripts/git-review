@@ -457,7 +457,7 @@ end
                        exit
                     end
                     if(!tree_hash)
-		        get_tree = `git review --show-raw #{review_del}`
+		        get_tree = `git review --view #{review_del}`
                         tree_hash= get_tree.lines.first
                         tree_hash= tree_hash.split[2]
                     end 
@@ -582,8 +582,10 @@ end
                            full_name = name + last_name
                            full_name = full_name.strip
                            full_name1 = last_name + name 
-                           full_name1 = full_name1.strip              
-                           if author_name!=last_name && author_name!=name && author_name!=full_name && author_name!=full_name1 
+                           full_name1 = full_name1.strip   
+                           checkfordel = ` git review --log-reviewer #{author_name} | grep #{commit} ` 
+                                  
+                           if author_name!=last_name && author_name!=name && author_name!=full_name && author_name!=full_name1 && checkfordel.length==0
                               reviewdel =  `git review --rm "#{reviewid}" "filter_author" "#{commit}" `
                               puts reviewdel  
                              
