@@ -14,7 +14,7 @@ if value == 1 and check =~ /^From/
               
          $value = 0;
         format_linux = show
-         subject = rev[3]
+         subject = rev[4]
         subject = subject.split(/Subject:/)
         subject[1].tr!("/", "-")
         
