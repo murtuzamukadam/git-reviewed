@@ -1,14 +1,14 @@
-To have git-review installed on your machine:
+To have git-reviewed installed on your machine:
 
-1) Clone the repository https://github.com/mmukadam/git-review
+1) Clone the repository https://github.com/mmukadam/git-reviewed
 2) Run sudo bash install
 3) Clone the repository you wish to review
-4) Run git-review --init inorder to initialize the tool to be able to review
+4) Run git-reviewed --init inorder to initialize the tool to be able to review
 5) Start reviewing
-6) Use git-review --pull inorder to pull all the reviews made in a repository
-7) Use git-review --push to push the reviews onto the repository 
+6) Use git-reviewed --pull inorder to pull all the reviews made in a repository
+7) Use git-reviewed --push to push the reviews onto the repository 
 
-*git-review runs a bunch of perl and ruby scripts. The following libraries are made use of in the scripts.
+*git-reviewed runs a bunch of perl and ruby scripts. The following libraries are made use of in the scripts.
  Please ensure you have these installed on the target machines.
 
 **tk toolkit for ruby:  $ sudo apt-get install libtcltk-ruby 

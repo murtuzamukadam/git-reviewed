@@ -37,7 +37,7 @@ sudo msg_to_commit.pl "$path1"
 rm -f -r msg_to_commit.pl
 
 else 
-echo "Please re-install git-review by following the installation steps before updating"
+echo "Please re-install git-reviewed by following the installation steps before updating"
 
 fi
 
