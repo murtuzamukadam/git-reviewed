@@ -1,0 +1,126 @@
+#!/bin/bash
+
+cd ..
+cd gmail-archive
+
+rm -f gmail-backup-linux.mbox
+touch gmail-backup-linux.mbox
+
+rm -f gmail-backup-git.mbox
+touch gmail-backup-git.mbox
+
+rm -f gmail-backup-postgres.mbox
+touch gmail-backup-postgres.mbox
+
+
+getmail --rcfile /home/m_mukadam/.getmail/getmail-rc-linux --rcfile /home/m_mukadam/.getmail/getmail-rc-git --rcfile /home/m_mukadam/.getmail/getmail-rc-postgres
+
+getmail --rcfile /home/m_mukadam/.getmail/getmail-rc-linux --rcfile /home/m_mukadam/.getmail/getmail-rc-git --rcfile /home/m_mukadam/.getmail/getmail-rc-postgres
+
+getmail --rcfile /home/m_mukadam/.getmail/getmail-rc-linux --rcfile /home/m_mukadam/.getmail/getmail-rc-git --rcfile /home/m_mukadam/.getmail/getmail-rc-postgres
+
+getmail --rcfile /home/m_mukadam/.getmail/getmail-rc-linux --rcfile /home/m_mukadam/.getmail/getmail-rc-git --rcfile /home/m_mukadam/.getmail/getmail-rc-postgres
+
+getmail --rcfile /home/m_mukadam/.getmail/getmail-rc-linux --rcfile /home/m_mukadam/.getmail/getmail-rc-git --rcfile /home/m_mukadam/.getmail/getmail-rc-postgres
+
+getmail --rcfile /home/m_mukadam/.getmail/getmail-rc-linux --rcfile /home/m_mukadam/.getmail/getmail-rc-git --rcfile /home/m_mukadam/.getmail/getmail-rc-postgres
+
+getmail --rcfile /home/m_mukadam/.getmail/getmail-rc-linux --rcfile /home/m_mukadam/.getmail/getmail-rc-git --rcfile /home/m_mukadam/.getmail/getmail-rc-postgres
+
+
+cd .. 
+cd linux-archive
+ruby break.rb /home/m_mukadam/gmail-archive/gmail-backup-linux.mbox
+ruby break1.rb /home/m_mukadam/gmail-archive/gmail-backup-linux.mbox
+
+
+echo "Start linux v3.12"
+cd /home/m_mukadam/linuxv3.12
+
+bash automate
+
+cd ..
+
+echo "Start linux"
+cd /home/m_mukadam/linux
+
+bash automate-linux
+
+cd ..
+
+
+echo "Start tj"
+
+cd /home/m_mukadam/kernel-git-tj-libata
+bash automate-linux
+bash auto
+cd ..
+
+echo "Start tiwai"
+
+cd /home/m_mukadam/kernel-git-tiwai-sound
+bash automate-linux
+bash auto
+cd ..
+
+echo "Start rafael"
+
+cd /home/m_mukadam/kernel-git-rafael-linux-pm
+bash automate-linux
+bash auto
+cd ..
+
+echo "Start davem"
+
+cd /home/m_mukadam/kernel-git-davem-net
+bash automate-linux
+bash auto
+cd ..
+
+echo "Start greg"
+
+cd /home/m_mukadam/kernel-git-gregkh-usb
+bash automate-linux
+bash auto
+cd ..
+
+
+rm -f /home/m_mukadam/linux-archive/mail
+
+cd .. 
+
+cd git-archive
+ruby break.rb /home/m_mukadam/gmail-archive/gmail-backup-git.mbox
+ruby break1.rb /home/m_mukadam/gmail-archive/gmail-backup-git.mbox
+
+echo "Start git"
+
+cd /home/m_mukadam/git
+
+bash automate-git
+
+cd .. 
+rm -f /home/m_mukadam/git-archive/mail
+
+cd ..
+
+cd postgres-archive
+ruby break.rb /home/m_mukadam/gmail-archive/gmail-backup-postgres.mbox
+ruby break1.rb /home/m_mukadam/gmail-archive/gmail-backup-postgres.mbox
+
+echo "Start postgres"
+
+cd /home/m_mukadam/postgres
+
+bash automate-postgres
+cd ..
+
+rm -f /home/m_mukadam/postgres-archive/mail
+
+
+
+
+
+
+
+

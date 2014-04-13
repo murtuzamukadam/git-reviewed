@@ -1,0 +1,6 @@
+To set up a cronjob to track reviews 
+
+
+*Use getmail to pull messages from email account and store on mbox file
+*Run auto-track
+  
